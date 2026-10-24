@@ -1,0 +1,7 @@
+dist
+target
+src-tauri/gen
+src-tauri/icons
+src/api/bindings.ts
+package-lock.json
+*.md

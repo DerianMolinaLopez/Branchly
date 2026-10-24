@@ -1,0 +1,58 @@
+/* highlight.js token colors, mapped to the syntax design tokens. */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-literal,
+.hljs-doctag {
+  color: var(--color-syntax-keyword);
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-template-variable {
+  color: var(--color-syntax-string);
+}
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--color-syntax-number);
+}
+.hljs-comment,
+.hljs-quote {
+  color: var(--color-syntax-comment);
+  font-style: italic;
+}
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: var(--color-syntax-function);
+}
+.hljs-type,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: var(--color-syntax-type);
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-name,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-tag {
+  color: var(--color-syntax-attr);
+}
+.hljs-meta,
+.hljs-punctuation,
+.hljs-operator {
+  color: var(--color-syntax-meta);
+}
+.hljs-variable,
+.hljs-params,
+.hljs-property {
+  color: var(--color-fg-secondary);
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: 600;
+}

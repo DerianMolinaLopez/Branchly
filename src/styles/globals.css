@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import './highlight.css';
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    color: var(--color-fg-secondary);
+    background-color: var(--color-canvas);
+    /* Navy to teal, brightest in the top-left corner. */
+    background-image:
+      radial-gradient(120% 80% at 0% 0%, rgb(15 58 69 / 0.75) 0%, transparent 55%),
+      linear-gradient(165deg, var(--color-base) 0%, var(--color-canvas) 60%);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    cursor: default;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-fg);
+  }
+
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  input,
+  textarea,
+  [data-selectable] {
+    user-select: text;
+    cursor: auto;
+  }
+
+  button {
+    cursor: default;
+  }
+
+  code,
+  kbd,
+  pre,
+  .font-mono {
+    font-variant-ligatures: none;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(72 176 192 / 0.28) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(72 176 192 / 0.22);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(72 176 192 / 0.4);
+  }
+}
+
+@layer components {
+  /* Highlighted separator: a cyan line fading out towards both ends. */
+  .accent-rule {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(34 224 240 / 0.55) 50%,
+      transparent 100%
+    );
+  }
+
+  .accent-rule-left {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(90deg, rgb(34 224 240 / 0.55) 0%, transparent 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
