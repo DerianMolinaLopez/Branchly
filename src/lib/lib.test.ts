@@ -57,5 +57,6 @@ describe('formatRelative', () => {
     expect(formatRelative(now - 10, now)).toBe('ahora');
     expect(formatRelative(now - 3 * 3600, now)).toMatch(/3 h/);
     expect(formatRelative(now - 24 * 3600, now)).toBe('ayer');
+    expect(formatRelative(now - 400 * 86400, now)).toMatch(/^hace 1 a/);
   });
 });

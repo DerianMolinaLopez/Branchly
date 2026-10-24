@@ -265,9 +265,10 @@ function DiffBody({
   useHotkey(SHORTCUTS.nextChange, () => goTo(1), active);
   useHotkey(SHORTCUTS.prevChange, () => goTo(-1), active);
 
-  const chars = longestLine(diff);
-  const side = GUTTER + SIGN + chars * CHAR_WIDTH + 24;
-  const minWidth = mode === 'unified' ? GUTTER * 2 + SIGN + chars * CHAR_WIDTH + 32 : side * 2;
+  // Unified lines scroll horizontally; side-by-side lines wrap so both
+  // halves stay visible, which makes their rows variable in height.
+  const minWidth =
+    mode === 'unified' ? GUTTER * 2 + SIGN + longestLine(diff) * CHAR_WIDTH + 32 : undefined;
   const working = source.type === 'working' ? source : null;
 
   return (
@@ -301,8 +302,13 @@ function DiffBody({
             return (
               <div
                 key={item.key}
+                data-index={item.index}
+                ref={mode === 'split' ? virtualizer.measureElement : undefined}
                 className="absolute inset-x-0 top-0"
-                style={{ transform: `translateY(${item.start}px)`, height: item.size }}
+                style={{
+                  transform: `translateY(${item.start}px)`,
+                  height: mode === 'split' && row.type !== 'hunk' ? undefined : item.size,
+                }}
               >
                 {row.type === 'hunk' ? (
                   <HunkHeader
@@ -443,13 +449,20 @@ const lineTone = {
 function Code({
   line,
   highlight,
+  wrap = false,
 }: {
   line: DiffLine;
   highlight: ((code: string) => string) | null;
+  wrap?: boolean;
 }) {
   const text = expandTabs(line.content);
   return (
-    <span className="pr-4 whitespace-pre text-fg-secondary">
+    <span
+      className={cn(
+        'pr-4 text-fg-secondary',
+        wrap ? 'min-w-0 wrap-anywhere whitespace-pre-wrap' : 'whitespace-pre',
+      )}
+    >
       {highlight ? <span dangerouslySetInnerHTML={{ __html: highlight(text) }} /> : text}
       {line.noNewline && (
         <span
@@ -495,7 +508,7 @@ const SplitPair = memo(function SplitPair({
   highlight: ((code: string) => string) | null;
 }) {
   return (
-    <div className="grid h-5 grid-cols-2 font-mono text-sm leading-5">
+    <div className="grid min-h-5 grid-cols-2 font-mono text-sm leading-5">
       <SplitSide line={row.left} number={row.left?.oldLine ?? null} highlight={highlight} />
       <SplitSide
         line={row.right}
@@ -521,7 +534,7 @@ function SplitSide({
   if (!line) return <div className={cn('bg-canvas/60', border && 'border-l border-line')} />;
   const tone = lineTone[line.kind];
   return (
-    <div className={cn('flex min-w-0 overflow-hidden', tone.row, border && 'border-l border-line')}>
+    <div className={cn('flex min-w-0', tone.row, border && 'border-l border-line')}>
       <span
         className={cn(
           'w-12 shrink-0 bg-canvas/40 pr-2 text-right text-xs leading-5 select-none',
@@ -531,7 +544,7 @@ function SplitSide({
         {number ?? ''}
       </span>
       <span className={cn('w-5 shrink-0 text-center select-none', tone.sign)}>{tone.mark}</span>
-      <Code line={line} highlight={highlight} />
+      <Code line={line} highlight={highlight} wrap />
     </div>
   );
 }

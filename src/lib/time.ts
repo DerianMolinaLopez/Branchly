@@ -1,4 +1,7 @@
-const relative = new Intl.RelativeTimeFormat('es', { numeric: 'auto', style: 'short' });
+// "ayer" reads better than "hace 1 d", but "el año pasado" is too long for
+// the graph's date column: only days use the idiomatic form.
+const relativeAuto = new Intl.RelativeTimeFormat('es', { numeric: 'auto', style: 'short' });
+const relative = new Intl.RelativeTimeFormat('es', { numeric: 'always', style: 'short' });
 const absolute = new Intl.DateTimeFormat('es', { dateStyle: 'medium', timeStyle: 'short' });
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
@@ -16,7 +19,9 @@ export function formatRelative(timestamp: number, now: number = Date.now() / 100
   const abs = Math.abs(diff);
   if (abs < 45) return 'ahora';
   for (const [unit, seconds] of UNITS) {
-    if (abs >= seconds) return relative.format(Math.round(diff / seconds), unit);
+    if (abs >= seconds) {
+      return (unit === 'day' ? relativeAuto : relative).format(Math.round(diff / seconds), unit);
+    }
   }
   return relative.format(Math.round(diff / 60), 'minute');
 }
