@@ -122,7 +122,17 @@ fn launch_path() -> Option<String> {
     Some(path.to_string_lossy().into_owned())
 }
 
+/// Name under which the desktop identifies the app on Linux: the Wayland
+/// app_id and the X11 `WM_CLASS`. It must match the installed launcher
+/// (`Branchly.desktop`, `StartupWMClass=Branchly`) so the taskbar shows the
+/// app icon and groups the window with the pinned launcher.
+#[cfg(target_os = "linux")]
+const PROGRAM_NAME: &str = "Branchly";
+
 pub fn run() {
+    #[cfg(target_os = "linux")]
+    glib::set_prgname(Some(PROGRAM_NAME));
+
     let builder = specta_builder();
     #[cfg(debug_assertions)]
     export_bindings(&builder, BINDINGS_PATH);

@@ -297,6 +297,7 @@ name = "branchly"
 version = "0.1.0"
 dependencies = [
  "branchly-core",
+ "glib",
  "notify",
  "notify-debouncer-full",
  "serde",

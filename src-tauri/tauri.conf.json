@@ -44,14 +44,27 @@
     "longDescription": "Branchly es un cliente Git de escritorio ligero, con gráfica de commits, staging por hunk, ramas, stash y más.",
     "icon": [
       "icons/32x32.png",
+      "icons/48x48.png",
+      "icons/64x64.png",
       "icons/128x128.png",
-      "icons/128x128@2x.png",
+      "icons/256x256.png",
+      "icons/512x512.png",
       "icons/icon.icns",
       "icons/icon.ico"
     ],
     "linux": {
-      "deb": { "depends": ["git"] },
-      "rpm": { "depends": ["git"] }
+      "deb": {
+        "depends": ["git"],
+        "desktopTemplate": "linux/branchly.desktop",
+        "section": "vcs"
+      },
+      "rpm": {
+        "depends": ["git"],
+        "desktopTemplate": "linux/branchly.desktop"
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
     }
   }
 }
