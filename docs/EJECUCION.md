@@ -11,10 +11,10 @@ consulta [CONSTRUCCION.md](CONSTRUCCION.md).
 | Ubuntu, Debian, Linux Mint, Pop!_OS | `Branchly_x.y.z_amd64.deb` | Sí, automáticamente |
 | Fedora, RHEL, openSUSE | `Branchly-x.y.z-1.x86_64.rpm` | Sí, automáticamente |
 
-Los ejecutables se generan en Ubuntu 22.04. Funcionan en esa versión y en
-cualquier distribución más reciente: Debian 12+, Fedora 36+, Linux Mint 21+,
-Arch y openSUSE Tumbleweed (para distribuciones más antiguas, ver
-[CONSTRUCCION.md](CONSTRUCCION.md#compatibilidad)).
+Los ejecutables se generan en Ubuntu 22.04 y se han probado en Ubuntu 22.04
+y 24.04, Debian 12, Fedora 40, Arch y openSUSE Tumbleweed. También deberían
+funcionar en las derivadas (Linux Mint 21+, Pop!_OS, Manjaro…); ver la
+[tabla de compatibilidad](CONSTRUCCION.md#compatibilidad).
 
 **Requisito en todos los casos:** tener **Git** instalado (`git --version`).
 Branchly usa tu Git para clonar, hacer fetch, pull, push y commits, con tus
@@ -54,11 +54,14 @@ Un AppImage no se integra solo en el escritorio. Elige una opción:
   chmod +x ~/Applications/Branchly.AppImage
 
   # El icono va dentro del AppImage
-  cd /tmp && ~/Applications/Branchly.AppImage --appimage-extract '*.png' >/dev/null
-  cp /tmp/squashfs-root/branchly.png ~/.local/share/icons/hicolor/256x256/apps/branchly.png
+  ICON=usr/share/icons/hicolor/256x256/apps/branchly.png
+  cd /tmp && ~/Applications/Branchly.AppImage --appimage-extract "$ICON" >/dev/null
+  cp "/tmp/squashfs-root/$ICON" ~/.local/share/icons/hicolor/256x256/apps/branchly.png
   rm -rf /tmp/squashfs-root
 
-  cat > ~/.local/share/applications/branchly.desktop <<EOF
+  # El nombre del archivo y StartupWMClass deben ser «Branchly» para que la
+  # barra de tareas agrupe la ventana con el icono fijado.
+  cat > ~/.local/share/applications/Branchly.desktop <<EOF
   [Desktop Entry]
   Type=Application
   Name=Branchly
@@ -66,7 +69,7 @@ Un AppImage no se integra solo en el escritorio. Elige una opción:
   Exec=$HOME/Applications/Branchly.AppImage %F
   Icon=branchly
   Categories=Development;RevisionControl;
-  StartupWMClass=branchly
+  StartupWMClass=Branchly
   Terminal=false
   EOF
   update-desktop-database ~/.local/share/applications 2>/dev/null || true
@@ -141,5 +144,5 @@ Branchly no guarda credenciales. Para empezar de cero, borra esa carpeta.
 | Ventana en blanco o parpadeos (tarjetas NVIDIA, algunas sesiones Wayland) | Abre Branchly con `WEBKIT_DISABLE_DMABUF_RENDERER=1 branchly`. Si funciona, añade esa variable a `Exec=` en el `.desktop` |
 | Push o fetch fallan pidiendo credenciales | Branchly no muestra prompts: configura un credential helper (`git config --global credential.helper libsecret`) o usa SSH con `ssh-agent`. Lo que funcione con `git push` en tu terminal funciona en Branchly |
 | «Tu identidad de Git no está configurada» | `git config --global user.name "Tu nombre"` y `git config --global user.email tu@correo` |
-| Icono genérico en la barra de tareas | Comprueba que el `.desktop` tenga `StartupWMClass=branchly` y que el icono esté en `~/.local/share/icons/hicolor/` (ver [CONSTRUCCION.md](CONSTRUCCION.md#integracion-con-el-escritorio)) |
+| Icono genérico en la barra de tareas (AppImage integrado a mano) | El lanzador debe llamarse `Branchly.desktop` y tener `StartupWMClass=Branchly`, y el icono tiene que estar en `~/.local/share/icons/hicolor/` (ver [CONSTRUCCION.md](CONSTRUCCION.md#integracion-con-el-escritorio)) |
 | No se refrescan los cambios hechos fuera en repositorios enormes | `sudo sysctl fs.inotify.max_user_watches=524288` |

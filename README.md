@@ -128,8 +128,15 @@ plataforma actual en `target/release/bundle/`:
 
 Para generar solo algunos formatos: `npm run app:build -- --bundles deb,rpm`.
 Estos paquetes solo funcionan en tu distribución y versiones más nuevas. Para
-ejecutables que funcionen en cualquier distribución (AppImage compilado en
-Ubuntu 22.04), sigue [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
+ejecutables que funcionen en cualquier distribución, compila en un contenedor
+Ubuntu 22.04 con Docker o Podman:
+
+```bash
+scripts/build-linux.sh   # AppImage + .deb + .rpm en dist-linux/
+```
+
+Los detalles, la tabla de distribuciones probadas y la publicación automática
+en GitHub están en [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
 Los iconos se regeneran desde `src-tauri/icons/logo.svg` con
 `npx tauri icon src-tauri/icons/logo.svg -o src-tauri/icons`.
 
@@ -139,7 +146,7 @@ Medido en Linux (Fedora 44, build de release):
 
 | Métrica | Resultado |
 |---|---|
-| Instalador `.deb` / `.rpm` | 4,1 MB |
+| Instalador `.deb` / `.rpm` / AppImage | 4,1 MB / 4,1 MB / 79 MB (el AppImage incluye WebKitGTK) |
 | Arranque hasta mostrar un repositorio abierto | ≈ 0,4 s |
 | Memoria total (app + procesos de WebKitGTK), sin repositorio | ≈ 240 MB, casi todo la base del WebView |
 | Memoria con un repositorio de 2 340 commits (ripgrep) | ≈ 300 MB |

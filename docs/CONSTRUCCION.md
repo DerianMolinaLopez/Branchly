@@ -1,259 +1,201 @@
 # Construir los ejecutables de Linux
 
-Plan e instrucciones para generar Branchly como **AppImage** (un único
-ejecutable para cualquier distribución) y como paquetes **.deb** y **.rpm**,
-integrados en el menú de aplicaciones y la barra de tareas. Para instalarlos y
-usarlos, consulta [EJECUCION.md](EJECUCION.md).
+Cómo generar Branchly como **AppImage** (un único ejecutable para cualquier
+distribución) y como paquetes **.deb** y **.rpm**, integrados en el menú de
+aplicaciones y la barra de tareas. Para instalarlos y usarlos, consulta
+[EJECUCION.md](EJECUCION.md).
 
-> **Estado:** este documento es el plan. Ya está verificado el build nativo en
-> Fedora 44: produce `.deb` y `.rpm` de 4,1 MB que instalan
-> `/usr/bin/branchly`, un `.desktop` e iconos. Los pasos del contenedor, el
-> AppImage y la publicación automática están pendientes de ejecutar; la lista
-> de verificación final indica qué comprobar.
+```bash
+scripts/build-linux.sh            # AppImage + .deb + .rpm portables en dist-linux/
+packaging/linux/test-appimage.sh  # prueba el AppImage en 6 distribuciones
+```
 
-## Por qué no basta con compilar en tu máquina
+## Por qué se compila en un contenedor
 
 Un binario de Tauri enlaza dos cosas del sistema donde se compila:
 
 1. **glibc**: el ejecutable exige una glibc igual o más nueva que la usada al
-   compilar. Fedora 44 trae glibc 2.43, así que un binario compilado ahí no
-   arranca en Ubuntu 22.04 (glibc 2.35).
+   compilar. Compilado en Fedora 44 (glibc 2.43) no arrancaría en Ubuntu
+   22.04 (glibc 2.35).
 2. **WebKitGTK 4.1**: los `.deb` y `.rpm` lo toman del sistema como
    dependencia; el AppImage lo lleva dentro.
 
-La solución estándar es **compilar dentro de un contenedor con una distribución
-antigua y estable**. Ubuntu 22.04 es la base que usa el propio Tauri en sus
-plantillas de CI.
+Por eso `scripts/build-linux.sh` compila en un contenedor **Ubuntu 22.04**. El
+binario resultante solo exige **glibc 2.34**.
 
 <a id="compatibilidad"></a>
 
-| Formato | Compilado en Ubuntu 22.04: funciona en | Necesita en el sistema |
+## Compatibilidad verificada
+
+El AppImage se probó en contenedores limpios de cada distribución, sobre la
+pantalla del escritorio: arranca, muestra la ventana y abre un repositorio de
+prueba con su gráfica, ramas, stash y cambios. Los paquetes nativos se
+instalaron con el gestor de cada sistema, que resolvió las dependencias sin
+que faltara ninguna biblioteca.
+
+| Distribución | glibc | AppImage | .deb | .rpm |
+|---|---|---|---|---|
+| Ubuntu 22.04 LTS | 2.35 | ✔ | ✔ | — |
+| Debian 12 | 2.36 | ✔ | ✔ | — |
+| Ubuntu 24.04 LTS | 2.39 | ✔ | — | — |
+| Fedora 40 | 2.39 | ✔ | — | ✔ |
+| Arch Linux | 2.44 | ✔ | — | — |
+| openSUSE Tumbleweed | 2.44 | ✔ | — | — |
+
+Por compartir base también deberían funcionar Linux Mint 21+, Pop!_OS 22.04+,
+elementary OS 7+, Zorin 17+, Manjaro y EndeavourOS (sin probar). No sirven las
+distribuciones sin WebKitGTK 4.1 ni glibc ≥ 2.34, como Ubuntu 20.04, Debian 11
+u openSUSE Leap 15.
+
+| Formato | Tamaño | Necesita en el sistema |
 |---|---|---|
-| AppImage | Ubuntu 22.04+, Debian 12+, Fedora 36+, Mint 21+, Pop!_OS 22.04+, Arch, Manjaro, openSUSE Tumbleweed | glibc ≥ 2.35, Git y FUSE 2 (o `--appimage-extract-and-run`) |
-| .deb | Ubuntu 22.04+, Debian 12+, Mint 21+, Pop!_OS 22.04+ | `libwebkit2gtk-4.1-0` (apt la instala) |
-| .rpm | Fedora 36+, RHEL/Alma/Rocky 9+, openSUSE Tumbleweed | `webkit2gtk4.1` (dnf/zypper la instalan) |
+| AppImage | 79 MB (incluye WebKitGTK) | Git, FUSE 2 (o `--appimage-extract-and-run`) y las bibliotecas gráficas de cualquier escritorio |
+| .deb | 4,1 MB | Nada: `apt` instala `libwebkit2gtk-4.1-0` y `git` |
+| .rpm | 4,1 MB | Nada: `dnf` / `zypper` instalan `webkit2gtk4.1` y `git` |
 
-Para distribuciones más antiguas (Ubuntu 20.04, Debian 11, openSUSE Leap 15)
-no hay WebKitGTK 4.1 en los repositorios: haría falta un Flatpak con el runtime
-de GNOME (ver la fase 5).
+## Fases
 
-## Plan
-
-| Fase | Objetivo | Resultado |
+| Fase | Qué | Estado |
 |---|---|---|
-| 1 | Build nativo para tu propia máquina | `.deb` / `.rpm` locales (**ya verificado**) |
-| 2 | Corregir la integración con el escritorio | Icono correcto en el menú y la barra en X11 y Wayland |
-| 3 | Build portable en contenedor Ubuntu 22.04 | AppImage + `.deb` + `.rpm` para cualquier distribución |
-| 4 | Publicación automática en GitHub | Ejecutables adjuntos a cada versión (`v0.2.0`…) |
-| 5 | Opcional: Flatpak / Flathub | Instalación desde las tiendas de software |
+| 1 | Build nativo para tu propia máquina | ✔ |
+| 2 | Integración con el menú y la barra de tareas | ✔ |
+| 3 | Build portable en contenedor (AppImage + .deb + .rpm) | ✔ |
+| 4 | Publicación automática en GitHub | ✔ Workflow listo (se activa al publicar una etiqueta) |
 
-### Fase 1: build nativo (para tu equipo)
+### 1. Build nativo
 
-Requisitos: los de desarrollo del [README](../README.md#requisitos).
+Con los requisitos del [README](../README.md#requisitos):
 
 ```bash
 npm ci
 npm run app:build -- --bundles deb,rpm
 ```
 
-Los paquetes quedan en `target/release/bundle/deb/` y `target/release/bundle/rpm/`.
-Solo sirven para tu distribución y versiones más nuevas.
+Deja los paquetes en `target/release/bundle/`. Solo sirven para tu
+distribución y versiones más nuevas; para distribuir, usa la fase 3.
 
 <a id="integracion-con-el-escritorio"></a>
 
-### Fase 2: integración con el menú y la barra de tareas
+### 2. Integración con el menú y la barra de tareas
 
-Revisando el `.rpm` generado se ven dos puntos a corregir **antes** de
-publicar:
+Para que la barra de tareas muestre el icono de Branchly y agrupe la ventana
+con el lanzador fijado, tienen que coincidir tres nombres:
 
-1. **Nombre del lanzador frente al identificador de la ventana.** El paquete
-   instala `Branchly.desktop`, pero la ventana se identifica como `branchly`.
-   En X11 coinciden gracias a `StartupWMClass=branchly`. En Wayland (GNOME),
-   la barra empareja la ventana con el lanzador por el nombre del archivo
-   (`branchly.desktop`), así que podría mostrar un icono genérico y no agrupar
-   la ventana con el icono fijado.
+| Qué | Valor | Dónde se define |
+|---|---|---|
+| Identidad de la ventana (app_id de Wayland y `WM_CLASS` de X11) | `Branchly` | `glib::set_prgname` en `src-tauri/src/lib.rs` |
+| Archivo del lanzador | `Branchly.desktop` | Nombre del producto en `tauri.conf.json` |
+| `StartupWMClass` del lanzador | `Branchly` | `src-tauri/linux/branchly.desktop` |
 
-   Cambio propuesto en `src-tauri/tauri.conf.json`: usar una plantilla de
-   lanzador propia para ambos paquetes y comprobar el resultado en GNOME
-   Wayland y KDE:
+Verificado en X11: la ventana se anuncia como `WM_CLASS = "Branchly",
+"Branchly"` y `desktop-file-validate` acepta el lanzador. En Wayland, GTK usa el
+mismo nombre de programa como app_id.
 
-   ```json
-   "linux": {
-     "deb": { "depends": ["git"], "desktopTemplate": "linux/branchly.desktop" },
-     "rpm": { "depends": ["git"], "desktopTemplate": "linux/branchly.desktop" }
-   }
-   ```
+La plantilla `src-tauri/linux/branchly.desktop` se usa en el `.deb`, el `.rpm`
+y el AppImage. Añade la categoría de control de versiones, palabras clave de
+búsqueda y `%F` para abrir carpetas.
 
-   ```ini
-   # src-tauri/linux/branchly.desktop
-   [Desktop Entry]
-   Type=Application
-   Name=Branchly
-   GenericName=Cliente Git
-   Comment=Cliente Git ligero y moderno
-   Exec=branchly %F
-   Icon=branchly
-   Terminal=false
-   Categories=Development;RevisionControl;
-   Keywords=git;branch;commit;merge;repositorio;
-   StartupWMClass=branchly
-   StartupNotify=true
-   ```
+Los paquetes instalan el icono en los tamaños estándar de
+`/usr/share/icons/hicolor` (32, 48, 64, 128, 256 y 512 px), que se generan
+desde `src-tauri/icons/logo.svg` (ver [Icono y logo](#icono-y-logo)).
 
-   Si en Wayland siguiera sin emparejar, la alternativa es fijar el
-   identificador de la aplicación al nombre del archivo (`Branchly`)
-   llamando a `glib::set_prgname("Branchly")` al arrancar, y poner
-   `StartupWMClass=Branchly` en la plantilla.
+### 3. Build portable en contenedor
 
-2. **Tamaños de icono.** Hoy se instalan 32, 128 y un 256 en una carpeta no
-   estándar (`256x256@2`). Los paneles usan 48 y 64 px, y los lanzadores
-   256 y 512. Hay que añadir esos PNG a `bundle.icon` (se generan con
-   `npx tauri icon src-tauri/icons/logo.svg -o src-tauri/icons`) y, si el
-   empaquetador no los coloca en su sitio, copiarlos en el paso de
-   empaquetado a `/usr/share/icons/hicolor/<tamaño>/apps/branchly.png`.
-
-### Fase 3: build portable en contenedor
-
-Se necesita **Podman** o **Docker** (ya están instalados en este equipo). El
-código se monta en el contenedor y los resultados quedan en `dist-linux/`.
-
-**1. Imagen de compilación** (`packaging/linux/Containerfile`):
-
-```dockerfile
-FROM ubuntu:22.04
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential curl wget file git ca-certificates pkg-config patchelf \
-      libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev \
-      libjavascriptcoregtk-4.1-dev librsvg2-dev libssl-dev xdg-utils rpm \
- && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
- && apt-get install -y nodejs \
- && rm -rf /var/lib/apt/lists/*
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-ENV PATH="/root/.cargo/bin:${PATH}"
-# linuxdeploy (que genera el AppImage) es a su vez un AppImage: sin FUSE en
-# el contenedor, se extrae y se ejecuta. NO_STRIP evita errores de su `strip`
-# antiguo con binarios recientes.
-ENV APPIMAGE_EXTRACT_AND_RUN=1 NO_STRIP=1
-WORKDIR /src
-```
-
-**2. Construir la imagen y compilar:**
+Necesita **Docker** o **Podman** (`CONTAINER_ENGINE=podman` para forzarlo):
 
 ```bash
-podman build -t branchly-builder -f packaging/linux/Containerfile .
-
-podman run --rm -v "$PWD":/src:Z -v branchly-cargo:/root/.cargo/registry \
-  branchly-builder bash -c '
-    npm ci &&
-    npx tauri build --bundles appimage,deb,rpm &&
-    mkdir -p dist-linux &&
-    cp target/release/bundle/appimage/*.AppImage \
-       target/release/bundle/deb/*.deb \
-       target/release/bundle/rpm/*.rpm dist-linux/ &&
-    cd dist-linux && sha256sum * > SHA256SUMS'
+scripts/build-linux.sh
 ```
 
-(Con Docker, cambia `podman` por `docker` y quita el `:Z`.) El volumen
-`branchly-cargo` guarda las crates descargadas entre ejecuciones. La primera
-compilación tarda unos 10–15 minutos; las siguientes, 2–3.
+Qué hace:
 
-Precauciones:
+1. Construye la imagen `branchly-linux-builder` desde
+   [`packaging/linux/Dockerfile`](../packaging/linux/Dockerfile): Ubuntu
+   22.04 con WebKitGTK, Node 22 y Rust.
+2. Ejecuta [`packaging/linux/build-in-container.sh`](../packaging/linux/build-in-container.sh),
+   que instala las dependencias de npm, compila y empaqueta el AppImage, el
+   `.deb` y el `.rpm`.
+3. Copia los resultados y `SHA256SUMS` a `dist-linux/` e informa de la glibc
+   mínima que exige el binario.
 
-- `node_modules` y `target` del anfitrión se comparten con el contenedor.
-  Antes de compilar dentro, conviene borrarlos o montar volúmenes separados
-  para ellos, para no mezclar binarios nativos de Fedora y de Ubuntu.
-- Recomendable añadir `dist-linux/` a `.gitignore`.
+Detalles:
 
-**3. Comprobar la compatibilidad mínima del binario:**
+- `node_modules`, el registro de Cargo, la carpeta de compilación y las
+  herramientas del AppImage viven en **volúmenes de Docker** propios
+  (`branchly-*`), separados de los de tu sistema: compilar en el contenedor no
+  interfiere con `npm run app:dev`.
+- Los archivos generados se devuelven a tu usuario: no quedan como propiedad
+  de root.
+- La primera ejecución tarda unos 10 minutos (descarga de la imagen y
+  compilación completa); las siguientes, 2–3.
+- Para liberar espacio después:
+  `docker volume rm branchly-node-modules branchly-cargo-registry branchly-target branchly-tauri-cache`
+  y `docker image rm branchly-linux-builder`.
+
+#### Probar el AppImage en varias distribuciones
 
 ```bash
-objdump -T target/release/branchly | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -1
-# Debe ser GLIBC_2.35 o inferior.
+packaging/linux/test-appimage.sh                        # las 6 de la tabla
+packaging/linux/test-appimage.sh ubuntu:22.04 fedora:40  # o solo algunas
 ```
 
-Una vez probado, estos pasos se pueden reunir en un script
-(`scripts/build-linux.sh`) que detecte Podman o Docker.
+Para cada distribución, el script:
 
-### Fase 4: publicación automática en GitHub
+- arranca un contenedor limpio e instala las bibliotecas gráficas que trae
+  cualquier escritorio (el formato AppImage las deja al sistema a propósito);
+- abre un repositorio de prueba con tu usuario;
+- comprueba que la ventana aparece y que el repositorio se abrió;
+- guarda una captura de cada distribución.
 
-Un workflow que, al crear una etiqueta `v*`, compile en `ubuntu-22.04` y
-adjunte los ejecutables a una Release (`.github/workflows/release.yml`):
+Necesita una sesión gráfica, `xprop` e ImageMagick.
 
-```yaml
-name: Release
-on:
-  push:
-    tags: ['v*']
-jobs:
-  linux:
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev \
-            libjavascriptcoregtk-4.1-dev librsvg2-dev patchelf rpm
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
-      - run: npm ci
-      - uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NO_STRIP: 1
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: Branchly ${{ github.ref_name }}
-          releaseDraft: true
-          args: --bundles appimage,deb,rpm
-```
+### 4. Publicación automática
 
-Publicar una versión quedaría así: subir la versión en `package.json`,
-`Cargo.toml` y `tauri.conf.json`, y ejecutar `git tag v0.2.0` y
-`git push --tags`. La Release se crea como borrador para revisarla antes de
-publicarla.
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) ejecuta el
+mismo `scripts/build-linux.sh` en GitHub Actions, así que los artefactos de la
+CI son idénticos a los locales. Se activa al subir una etiqueta de versión:
 
-### Fase 5 (opcional): Flatpak
+1. Sube la versión en `package.json`, `Cargo.toml` (`[workspace.package]`) y
+   `src-tauri/tauri.conf.json`, y haz commit.
+2. `git tag v0.2.0 && git push origin v0.2.0`.
+3. El workflow compila, adjunta el AppImage, el `.deb`, el `.rpm` y
+   `SHA256SUMS` a un **borrador de Release** con notas generadas, y también
+   los deja como artefacto de la ejecución.
+4. Revisa el borrador en GitHub y publícalo.
 
-Un Flatpak funciona incluso en distribuciones sin WebKitGTK 4.1 (usa el
-runtime `org.gnome.Platform`) y permite publicar en Flathub, que aparece en
-GNOME Software y Discover. Requiere un manifiesto propio y permisos de sandbox
-para acceder a las carpetas de los repositorios y al `ssh-agent`. Además,
-Branchly necesita el `git` del anfitrión, que habría que invocar con
-`flatpak-spawn --host`. Es el formato más trabajoso: se recomienda abordarlo
-después del AppImage.
+También puede lanzarse a mano desde la pestaña Actions («Run workflow»); en
+ese caso solo se guardan los artefactos, sin crear Release.
 
 ## Lista de verificación antes de publicar
 
-Probar el AppImage al menos en Ubuntu 22.04, Fedora y Arch. Sirven máquinas
-virtuales o `distrobox`, aunque la barra de tareas solo puede probarse en un
-escritorio real.
+- [ ] `packaging/linux/test-appimage.sh` pasa en todas las distribuciones.
+- [ ] La salida de `scripts/build-linux.sh` indica glibc ≤ 2.35.
+- [ ] En tu escritorio: instalar el `.deb` o el `.rpm`, fijar Branchly en la
+      barra y comprobar que la ventana abierta se agrupa con el icono fijado
+      (GNOME Wayland, GNOME X11 y KDE si es posible).
+- [ ] Clonar, fetch y push funcionan con HTTPS (credential helper) y SSH
+      (`ssh-agent`).
+- [ ] `sha256sum -c SHA256SUMS` dentro de `dist-linux/`.
 
-- [ ] Arranca sin errores y abre un repositorio (`./Branchly.AppImage ~/repo`).
-- [ ] `objdump` confirma GLIBC ≤ 2.35.
-- [ ] Con el `.deb` o el `.rpm`, Branchly aparece en el menú con el icono nuevo.
-- [ ] Al fijarlo en la barra (GNOME Wayland, GNOME X11, KDE) y abrirlo, la
-      ventana se agrupa con el icono fijado y no aparece un icono genérico.
-- [ ] Los pasos manuales de integración del AppImage de
-      [EJECUCION.md](EJECUCION.md) funcionan; en particular, que el icono
-      dentro del AppImage se llame `branchly.png`.
-- [ ] Clonar, fetch y push funcionan con credenciales HTTPS (credential
-      helper) y SSH (`ssh-agent`).
-- [ ] `SHA256SUMS` coincide con los archivos publicados.
+<a id="icono-y-logo"></a>
 
 ## Icono y logo
 
-El icono parte de un único SVG, `src-tauri/icons/logo.svg`: una «b» formada
-por una rama de Git que sale del tronco (cian) y vuelve a fusionarse
-(violeta), sobre el degradado azul marino-teal de la app. Para regenerar todos
-los tamaños (PNG, `.ico` y `.icns`) tras modificarlo:
+Todo parte de `src-tauri/icons/logo.svg`: una «b» formada por una rama de Git
+que sale del tronco (cian) y se fusiona de vuelta (violeta), sobre el
+degradado azul marino-teal de la app. Tras modificarlo:
 
 ```bash
 npx tauri icon src-tauri/icons/logo.svg -o src-tauri/icons
+npx tauri icon src-tauri/icons/logo.svg -o /tmp/icons-extra -p 48 -p 256 -p 512
+cp /tmp/icons-extra/{48x48,256x256,512x512}.png src-tauri/icons/
 rm -rf src-tauri/icons/android src-tauri/icons/ios
-cp src-tauri/icons/logo.svg public/logo.svg   # el logo de la propia interfaz
+cp src-tauri/icons/logo.svg public/logo.svg   # logo de la propia interfaz
 ```
+
+## Fuera de alcance: Flatpak
+
+Un Flatpak permitiría publicar en Flathub y funcionar en distribuciones sin
+WebKitGTK 4.1, pero necesita un manifiesto propio, permisos de sandbox para
+acceder a las carpetas y al `ssh-agent`, e invocar el `git` del anfitrión con
+`flatpak-spawn --host`. Se ha dejado fuera por ahora.
