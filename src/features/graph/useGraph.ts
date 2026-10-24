@@ -17,7 +17,12 @@ export function useGraphInfo(repoId: string) {
  * a moved ref invalidates everything at once. While a new fingerprint loads,
  * the same chunk of the previous layout stays on screen to avoid flicker.
  */
-export function useGraphRows(repoId: string, info: GraphInfo | undefined, start: number, end: number) {
+export function useGraphRows(
+  repoId: string,
+  info: GraphInfo | undefined,
+  start: number,
+  end: number,
+) {
   const fingerprint = info?.fingerprint ?? '';
   const chunks = useMemo(() => {
     if (!info || info.total === 0 || end <= start) return [];
@@ -40,8 +45,10 @@ export function useGraphRows(repoId: string, info: GraphInfo | undefined, start:
         }
       },
       staleTime: Infinity,
-      placeholderData: (previous: GraphRow[] | undefined, previousQuery?: { queryKey: readonly unknown[] }) =>
-        previousQuery?.queryKey[5] === chunk ? previous : undefined,
+      placeholderData: (
+        previous: GraphRow[] | undefined,
+        previousQuery?: { queryKey: readonly unknown[] },
+      ) => (previousQuery?.queryKey[5] === chunk ? previous : undefined),
     })),
   });
 

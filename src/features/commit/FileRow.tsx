@@ -12,7 +12,8 @@ export function FileRow({
   trailing,
   actions,
 }: {
-  file: Pick<FileChange, 'path' | 'oldPath' | 'kind'> & Partial<Pick<FileChange, 'additions' | 'deletions' | 'binary'>>;
+  file: Pick<FileChange, 'path' | 'oldPath' | 'kind'> &
+    Partial<Pick<FileChange, 'additions' | 'deletions' | 'binary'>>;
   selected?: boolean;
   onOpen: () => void;
   trailing?: ReactNode;
@@ -34,7 +35,10 @@ export function FileRow({
         title={file.oldPath ? `${file.oldPath} → ${file.path}` : file.path}
         className="flex min-w-0 flex-1 items-center gap-2 text-left focus-visible:outline-offset-0"
       >
-        <span className={cn('w-3 shrink-0 text-center font-mono text-xs font-semibold', kind.className)} aria-label={kind.label}>
+        <span
+          className={cn('w-3 shrink-0 text-center font-mono text-xs font-semibold', kind.className)}
+          aria-label={kind.label}
+        >
           {kind.letter}
         </span>
         <span className="min-w-0 truncate">
@@ -53,7 +57,15 @@ export function FileRow({
 }
 
 /** "+12 −3" line counts. */
-export function LineCounts({ additions, deletions, binary }: { additions: number; deletions: number; binary?: boolean }) {
+export function LineCounts({
+  additions,
+  deletions,
+  binary,
+}: {
+  additions: number;
+  deletions: number;
+  binary?: boolean;
+}) {
   if (binary) return <span className="shrink-0 font-mono text-2xs text-fg-subtle">binario</span>;
   return (
     <span className="flex shrink-0 gap-1.5 font-mono text-2xs tabular-nums">

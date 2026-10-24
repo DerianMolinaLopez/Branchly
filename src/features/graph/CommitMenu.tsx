@@ -7,14 +7,19 @@ import { openDialog } from '@/features/dialogs/store';
 import { runAction } from '@/features/repo/actions';
 import { ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuSub } from '@/ui';
 
-const RESET_COPY: Record<ResetMode, { label: string; description: string; consequences?: string[] }> = {
+const RESET_COPY: Record<
+  ResetMode,
+  { label: string; description: string; consequences?: string[] }
+> = {
   soft: {
     label: 'Soft: conservar cambios preparados',
-    description: 'La rama apunta al commit elegido; los cambios de los commits posteriores quedan preparados.',
+    description:
+      'La rama apunta al commit elegido; los cambios de los commits posteriores quedan preparados.',
   },
   mixed: {
     label: 'Mixed: conservar cambios sin preparar',
-    description: 'La rama apunta al commit elegido; los cambios posteriores quedan en el árbol de trabajo sin preparar.',
+    description:
+      'La rama apunta al commit elegido; los cambios posteriores quedan en el árbol de trabajo sin preparar.',
   },
   hard: {
     label: 'Hard: descartar todo',
@@ -59,13 +64,21 @@ export function CommitMenuItems({
       <ContextMenuLabel>
         {commit.shortId} {commit.summary}
       </ContextMenuLabel>
-      <ContextMenuItem icon={<GitCommitVertical />} disabled={isHead} onSelect={() => void checkoutCommit(repoId, commit.id)}>
+      <ContextMenuItem
+        icon={<GitCommitVertical />}
+        disabled={isHead}
+        onSelect={() => void checkoutCommit(repoId, commit.id)}
+      >
         Hacer checkout de este commit
       </ContextMenuItem>
       <ContextMenuItem
         icon={<GitBranchPlus />}
         onSelect={() => {
-          openDialog({ kind: 'createBranch', repoId, start: { sha: commit.id, label: commit.shortId } });
+          openDialog({
+            kind: 'createBranch',
+            repoId,
+            start: { sha: commit.id, label: commit.shortId },
+          });
         }}
       >
         Crear rama aquí…

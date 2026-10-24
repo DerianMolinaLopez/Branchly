@@ -28,14 +28,38 @@ export function groupRefs(labels: RefLabel[]): RefGroup[] {
   const branches = new Map<string, RefGroup>();
   for (const label of labels) {
     if (label.kind === 'tag') {
-      groups.push({ key: label.fullName, name: label.name, kind: 'tag', local: null, remotes: [], tag: label, isHead: false });
+      groups.push({
+        key: label.fullName,
+        name: label.name,
+        kind: 'tag',
+        local: null,
+        remotes: [],
+        tag: label,
+        isHead: false,
+      });
     } else if (label.kind === 'head') {
-      groups.push({ key: 'HEAD', name: 'HEAD', kind: 'head', local: null, remotes: [], tag: null, isHead: true });
+      groups.push({
+        key: 'HEAD',
+        name: 'HEAD',
+        kind: 'head',
+        local: null,
+        remotes: [],
+        tag: null,
+        isHead: true,
+      });
     } else {
       const short = label.kind === 'localBranch' ? label.name : remoteBranchName(label.name);
       let group = branches.get(short);
       if (!group) {
-        group = { key: `branch:${short}`, name: label.name, kind: 'branch', local: null, remotes: [], tag: null, isHead: false };
+        group = {
+          key: `branch:${short}`,
+          name: label.name,
+          kind: 'branch',
+          local: null,
+          remotes: [],
+          tag: null,
+          isHead: false,
+        };
         branches.set(short, group);
         groups.push(group);
       }
@@ -48,6 +72,7 @@ export function groupRefs(labels: RefLabel[]): RefGroup[] {
       }
     }
   }
-  const rank = (g: RefGroup) => (g.isHead ? 0 : g.kind === 'head' ? 1 : g.kind === 'branch' ? 2 : 3);
+  const rank = (g: RefGroup) =>
+    g.isHead ? 0 : g.kind === 'head' ? 1 : g.kind === 'branch' ? 2 : 3;
   return groups.sort((a, b) => rank(a) - rank(b));
 }

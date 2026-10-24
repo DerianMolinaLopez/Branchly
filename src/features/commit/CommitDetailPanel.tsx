@@ -7,7 +7,16 @@ import { copyText } from '@/lib/clipboard';
 import { formatAbsolute, formatRelative } from '@/lib/time';
 import { focusCommit } from '@/features/repo/navigation';
 import { useRepoUi, useWorkspace } from '@/stores/workspace';
-import { Avatar, ContextMenu, ContextMenuContent, ContextMenuTrigger, EmptyState, SectionTitle, SkeletonRows, Tooltip } from '@/ui';
+import {
+  Avatar,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
+  EmptyState,
+  SectionTitle,
+  SkeletonRows,
+  Tooltip,
+} from '@/ui';
 import { FileMenuItems } from './FileMenu';
 import { FileRow, LineCounts } from './FileRow';
 
@@ -20,7 +29,13 @@ export function CommitDetailPanel({ repoId, sha }: { repoId: string; sha: string
 
   if (detail.isPending) return <SkeletonRows count={8} className="p-4" />;
   if (detail.isError) {
-    return <EmptyState tone="error" title="no se pudo cargar el commit" description={detail.error.message} />;
+    return (
+      <EmptyState
+        tone="error"
+        title="no se pudo cargar el commit"
+        description={detail.error.message}
+      />
+    );
   }
   return (
     <motion.div
@@ -68,7 +83,10 @@ function CommitHeader({ repoId, commit }: { repoId: string; commit: CommitDetail
         {commit.summary || <span className="text-fg-subtle italic">Sin mensaje</span>}
       </h2>
       {commit.body && (
-        <p className="mt-2 max-h-40 overflow-y-auto text-base break-words whitespace-pre-wrap text-fg-secondary" data-selectable>
+        <p
+          className="mt-2 max-h-40 overflow-y-auto text-base break-words whitespace-pre-wrap text-fg-secondary"
+          data-selectable
+        >
           {commit.body}
         </p>
       )}
@@ -84,7 +102,9 @@ function CommitHeader({ repoId, commit }: { repoId: string; commit: CommitDetail
             {formatRelative(commit.author.timestamp)}, {formatAbsolute(commit.author.timestamp)}
           </p>
           {committedBySomeoneElse && (
-            <p className="truncate text-sm text-fg-subtle">Confirmado por {commit.committer.name}</p>
+            <p className="truncate text-sm text-fg-subtle">
+              Confirmado por {commit.committer.name}
+            </p>
           )}
         </div>
       </div>
@@ -113,7 +133,10 @@ function CommitHeader({ repoId, commit }: { repoId: string; commit: CommitDetail
             <dt className="text-fg-subtle">Referencias</dt>
             <dd className="flex flex-wrap gap-1">
               {commit.refs.map((ref) => (
-                <span key={ref.fullName} className="rounded-chip border border-line bg-canvas/60 px-1.5 font-mono text-xs text-fg-secondary">
+                <span
+                  key={ref.fullName}
+                  className="rounded-chip border border-line bg-canvas/60 px-1.5 font-mono text-xs text-fg-secondary"
+                >
                   {ref.name}
                 </span>
               ))}
@@ -128,7 +151,10 @@ function CommitHeader({ repoId, commit }: { repoId: string; commit: CommitDetail
 function CommitFiles({ repoId, commit }: { repoId: string; commit: CommitDetail }) {
   const { center } = useRepoUi(repoId);
   const setCenter = useWorkspace((s) => s.setCenter);
-  const openPath = center.kind === 'diff' && center.source.type === 'commit' && center.source.sha === commit.id ? center.source.path : null;
+  const openPath =
+    center.kind === 'diff' && center.source.type === 'commit' && center.source.sha === commit.id
+      ? center.source.path
+      : null;
   const { stats } = commit;
   return (
     <section className="flex min-h-0 flex-1 flex-col">
@@ -139,7 +165,9 @@ function CommitFiles({ repoId, commit }: { repoId: string; commit: CommitDetail 
         <LineCounts additions={stats.additions} deletions={stats.deletions} />
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
-        {commit.files.length === 0 && <p className="px-2 py-3 text-sm text-fg-muted">Este commit no cambia archivos.</p>}
+        {commit.files.length === 0 && (
+          <p className="px-2 py-3 text-sm text-fg-muted">Este commit no cambia archivos.</p>
+        )}
         {commit.files.map((file) => (
           <ContextMenu key={file.path}>
             <ContextMenuTrigger>
@@ -150,10 +178,21 @@ function CommitFiles({ repoId, commit }: { repoId: string; commit: CommitDetail 
                   onOpen={() => {
                     setCenter(repoId, {
                       kind: 'diff',
-                      source: { type: 'commit', sha: commit.id, path: file.path, oldPath: file.oldPath },
+                      source: {
+                        type: 'commit',
+                        sha: commit.id,
+                        path: file.path,
+                        oldPath: file.oldPath,
+                      },
                     });
                   }}
-                  trailing={<LineCounts additions={file.additions} deletions={file.deletions} binary={file.binary} />}
+                  trailing={
+                    <LineCounts
+                      additions={file.additions}
+                      deletions={file.deletions}
+                      binary={file.binary}
+                    />
+                  }
                 />
               </div>
             </ContextMenuTrigger>
@@ -163,7 +202,9 @@ function CommitFiles({ repoId, commit }: { repoId: string; commit: CommitDetail 
           </ContextMenu>
         ))}
         {commit.filesTruncated && (
-          <p className="px-2 py-2 text-sm text-fg-muted">Lista recortada: el commit cambia demasiados archivos.</p>
+          <p className="px-2 py-2 text-sm text-fg-muted">
+            Lista recortada: el commit cambia demasiados archivos.
+          </p>
         )}
       </div>
     </section>

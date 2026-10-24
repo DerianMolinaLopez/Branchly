@@ -1,8 +1,7 @@
 import type { DiffLine, FileDiff } from '@/api';
 
 export type UnifiedRow =
-  | { type: 'hunk'; hunk: number; header: string }
-  | { type: 'line'; hunk: number; line: DiffLine };
+  { type: 'hunk'; hunk: number; header: string } | { type: 'line'; hunk: number; line: DiffLine };
 
 export type SplitRow =
   | { type: 'hunk'; hunk: number; header: string }

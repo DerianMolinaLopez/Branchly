@@ -43,8 +43,11 @@ export function GraphSearch({
 }) {
   const [query, setQuery] = useState('');
   const [field, setField] = useState<SearchField>('all');
-  const [position, setPosition] = useState(0);
   const debounced = useDebounced(query.trim(), 180);
+  // The position resets whenever the query or the field changes.
+  const searchKey = `${field}:${debounced}`;
+  const [cursor, setCursor] = useState({ key: searchKey, position: 0 });
+  const position = cursor.key === searchKey ? cursor.position : 0;
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollToRow = useWorkspace((s) => s.scrollToRow);
 
@@ -61,10 +64,6 @@ export function GraphSearch({
   }, [focusToken]);
 
   useEffect(() => {
-    setPosition(0);
-  }, [debounced, field]);
-
-  useEffect(() => {
     onMatches(new Set(rows), current);
     if (current !== null) scrollToRow(repoId, current, true);
     // `rows` identity follows the query result.
@@ -73,7 +72,7 @@ export function GraphSearch({
 
   const step = (delta: number) => {
     if (rows.length === 0) return;
-    setPosition((p) => (p + delta + rows.length) % rows.length);
+    setCursor({ key: searchKey, position: (position + delta + rows.length) % rows.length });
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -119,11 +118,30 @@ export function GraphSearch({
       />
       {debounced ? (
         <>
-          <span className="shrink-0 px-1 font-mono text-xs text-fg-muted tabular-nums" aria-live="polite">
-            {results.isFetching ? '…' : rows.length === 0 ? '0' : `${Math.min(position, rows.length - 1) + 1}/${rows.length}`}
+          <span
+            className="shrink-0 px-1 font-mono text-xs text-fg-muted tabular-nums"
+            aria-live="polite"
+          >
+            {results.isFetching
+              ? '…'
+              : rows.length === 0
+                ? '0'
+                : `${Math.min(position, rows.length - 1) + 1}/${rows.length}`}
           </span>
-          <IconButton size="sm" label="Anterior" shortcut="shift+enter" icon={<ChevronUp />} onClick={() => step(-1)} />
-          <IconButton size="sm" label="Siguiente" shortcut="enter" icon={<ChevronDown />} onClick={() => step(1)} />
+          <IconButton
+            size="sm"
+            label="Anterior"
+            shortcut="shift+enter"
+            icon={<ChevronUp />}
+            onClick={() => step(-1)}
+          />
+          <IconButton
+            size="sm"
+            label="Siguiente"
+            shortcut="enter"
+            icon={<ChevronDown />}
+            onClick={() => step(1)}
+          />
           <IconButton
             size="sm"
             label="Limpiar búsqueda"

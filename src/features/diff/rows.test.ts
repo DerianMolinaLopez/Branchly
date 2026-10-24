@@ -2,9 +2,27 @@ import { describe, expect, it } from 'vitest';
 import type { DiffLine, FileDiff } from '@/api';
 import { changeBlocks, longestLine, splitRows, unifiedRows } from './rows';
 
-const ctx = (n: number, content = `c${n}`): DiffLine => ({ kind: 'context', oldLine: n, newLine: n, content, noNewline: false });
-const del = (n: number, content = `d${n}`): DiffLine => ({ kind: 'deleted', oldLine: n, newLine: null, content, noNewline: false });
-const add = (n: number, content = `a${n}`): DiffLine => ({ kind: 'added', oldLine: null, newLine: n, content, noNewline: false });
+const ctx = (n: number, content = `c${n}`): DiffLine => ({
+  kind: 'context',
+  oldLine: n,
+  newLine: n,
+  content,
+  noNewline: false,
+});
+const del = (n: number, content = `d${n}`): DiffLine => ({
+  kind: 'deleted',
+  oldLine: n,
+  newLine: null,
+  content,
+  noNewline: false,
+});
+const add = (n: number, content = `a${n}`): DiffLine => ({
+  kind: 'added',
+  oldLine: null,
+  newLine: n,
+  content,
+  noNewline: false,
+});
 
 const diff: FileDiff = {
   path: 'f.txt',
@@ -49,7 +67,9 @@ describe('diff rows', () => {
   });
 
   it('measures the longest line with tabs expanded', () => {
-    const tabbed: FileDiff = { ...diff, hunks: [{ ...diff.hunks[0]!, lines: [ctx(1, '\tx')] }] };
+    const [first] = diff.hunks;
+    if (!first) throw new Error('fixture has a hunk');
+    const tabbed: FileDiff = { ...diff, hunks: [{ ...first, lines: [ctx(1, '\tx')] }] };
     expect(longestLine(tabbed)).toBe(5);
   });
 });

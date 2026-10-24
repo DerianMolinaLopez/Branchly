@@ -14,7 +14,13 @@ describe('graph geometry', () => {
 
   it('edges span from the previous row center to the current one', () => {
     const s = edgeSegment({ from: 1, to: 0, color: 3 }, 5);
-    expect(s).toEqual({ x1: laneX(1), y1: rowCenterY(4), x2: laneX(0), y2: rowCenterY(5), color: 3 });
+    expect(s).toEqual({
+      x1: laneX(1),
+      y1: rowCenterY(4),
+      x2: laneX(0),
+      y2: rowCenterY(5),
+      color: 3,
+    });
   });
 
   it('curves leave and enter vertically', () => {
@@ -56,7 +62,9 @@ function fakeContext() {
     get: (target, prop: string) => {
       if (prop in target) return target[prop];
       return (...args: unknown[]) => {
-        calls.push(`${prop}(${args.map((a) => (typeof a === 'number' ? a.toFixed(1) : String(a))).join(',')})`);
+        calls.push(
+          `${prop}(${args.map((a) => (typeof a === 'number' ? a.toFixed(1) : String(a))).join(',')})`,
+        );
       };
     },
     set: (target, prop: string, value) => {
@@ -86,10 +94,15 @@ describe('drawGraph', () => {
           { from: 0, to: 0, color: 0 },
           { from: 0, to: 1, color: 1 },
         ]),
-        row('c', 0, [
-          { from: 0, to: 0, color: 0 },
-          { from: 1, to: 0, color: 1 },
-        ], true),
+        row(
+          'c',
+          0,
+          [
+            { from: 0, to: 0, color: 0 },
+            { from: 1, to: 0, color: 1 },
+          ],
+          true,
+        ),
       ],
       firstOffset: 0,
       width: 100,

@@ -18,8 +18,19 @@ import { EmptyState, IconButton, SkeletonRows, Tooltip } from '@/ui';
 const LINE_HEIGHT = 20;
 
 /** Who last changed each line of a file (as of HEAD). */
-export function BlameView({ repoId, path, onClose }: { repoId: string; path: string; onClose: () => void }) {
-  const blame = useQuery({ queryKey: keys.blame(repoId, path), queryFn: () => commitsApi.blame(repoId, path) });
+export function BlameView({
+  repoId,
+  path,
+  onClose,
+}: {
+  repoId: string;
+  path: string;
+  onClose: () => void;
+}) {
+  const blame = useQuery({
+    queryKey: keys.blame(repoId, path),
+    queryFn: () => commitsApi.blame(repoId, path),
+  });
   const active = useRepoActive();
   useHotkey(SHORTCUTS.close, onClose, active);
   const highlight = useHighlighter(languageFor(path));
@@ -29,7 +40,8 @@ export function BlameView({ repoId, path, onClose }: { repoId: string; path: str
   const lineInfo = useMemo(() => {
     const info: { hunk: BlameHunk; order: number; first: boolean }[] = [];
     blame.data?.hunks.forEach((hunk, order) => {
-      for (let i = 0; i < hunk.lineCount; i++) info[hunk.startLine - 1 + i] = { hunk, order, first: i === 0 };
+      for (let i = 0; i < hunk.lineCount; i++)
+        info[hunk.startLine - 1 + i] = { hunk, order, first: i === 0 };
     });
     return info;
   }, [blame.data]);
@@ -54,14 +66,20 @@ export function BlameView({ repoId, path, onClose }: { repoId: string; path: str
       {blame.isPending ? (
         <SkeletonRows count={14} className="p-4" />
       ) : blame.isError ? (
-        <EmptyState tone="error" title="no se pudo calcular el blame" description={blame.error.message} />
+        <EmptyState
+          tone="error"
+          title="no se pudo calcular el blame"
+          description={blame.error.message}
+        />
       ) : (
         <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
           <div className="relative min-w-max" style={{ height: virtualizer.getTotalSize() }}>
             {virtualizer.getVirtualItems().map((item) => {
               const info = lineInfo[item.index];
               const text = expandTabs(lines[item.index] ?? '');
-              const color = info ? `var(--color-lane-${colorIndex(info.hunk.commitId)})` : undefined;
+              const color = info
+                ? `var(--color-lane-${colorIndex(info.hunk.commitId)})`
+                : undefined;
               return (
                 <div
                   key={item.key}
@@ -72,7 +90,10 @@ export function BlameView({ repoId, path, onClose }: { repoId: string; path: str
                   )}
                   style={{ transform: `translateY(${item.start}px)` }}
                 >
-                  <span className="sticky left-0 flex w-72 shrink-0 items-center gap-2 border-r border-line bg-base pr-2 pl-2" style={{ boxShadow: color ? `inset 2px 0 0 ${color}` : undefined }}>
+                  <span
+                    className="sticky left-0 flex w-72 shrink-0 items-center gap-2 border-r border-line bg-base pr-2 pl-2"
+                    style={{ boxShadow: color ? `inset 2px 0 0 ${color}` : undefined }}
+                  >
                     {info?.first && (
                       <Tooltip content={info.hunk.summary} side="right">
                         <button
@@ -82,16 +103,25 @@ export function BlameView({ repoId, path, onClose }: { repoId: string; path: str
                         >
                           <span className="font-mono text-fg-muted">{info.hunk.shortId}</span>
                           <span className="truncate text-fg-secondary">{info.hunk.author}</span>
-                          <span className="ml-auto shrink-0 text-fg-subtle" title={formatAbsolute(info.hunk.timestamp)}>
+                          <span
+                            className="ml-auto shrink-0 text-fg-subtle"
+                            title={formatAbsolute(info.hunk.timestamp)}
+                          >
                             {formatRelative(info.hunk.timestamp)}
                           </span>
                         </button>
                       </Tooltip>
                     )}
                   </span>
-                  <span className="w-12 shrink-0 pr-2 text-right text-xs leading-5 text-fg-subtle select-none">{item.index + 1}</span>
+                  <span className="w-12 shrink-0 pr-2 text-right text-xs leading-5 text-fg-subtle select-none">
+                    {item.index + 1}
+                  </span>
                   <span className="pr-6 whitespace-pre text-fg-secondary" data-selectable>
-                    {highlight ? <span dangerouslySetInnerHTML={{ __html: highlight(text) }} /> : text}
+                    {highlight ? (
+                      <span dangerouslySetInnerHTML={{ __html: highlight(text) }} />
+                    ) : (
+                      text
+                    )}
                   </span>
                 </div>
               );

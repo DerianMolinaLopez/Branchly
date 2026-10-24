@@ -5,10 +5,20 @@ import { useWorkspace } from '@/stores/workspace';
 import { ContextMenuItem, ContextMenuSeparator, toast } from '@/ui';
 
 /** Context-menu items shared by every file list. */
-export function FileMenuItems({ repoId, path, exists = true }: { repoId: string; path: string; exists?: boolean }) {
+export function FileMenuItems({
+  repoId,
+  path,
+  exists = true,
+}: {
+  repoId: string;
+  path: string;
+  exists?: boolean;
+}) {
   const setCenter = useWorkspace((s) => s.setCenter);
   const fail = (error: unknown) => {
-    toast.error('No se pudo abrir', { description: error instanceof Error ? error.message : String(error) });
+    toast.error('No se pudo abrir', {
+      description: error instanceof Error ? error.message : String(error),
+    });
   };
   return (
     <>
@@ -30,10 +40,18 @@ export function FileMenuItems({ repoId, path, exists = true }: { repoId: string;
         Ver blame
       </ContextMenuItem>
       <ContextMenuSeparator />
-      <ContextMenuItem icon={<ExternalLink />} disabled={!exists} onSelect={() => void systemApi.openInEditor(repoId, path).catch(fail)}>
+      <ContextMenuItem
+        icon={<ExternalLink />}
+        disabled={!exists}
+        onSelect={() => void systemApi.openInEditor(repoId, path).catch(fail)}
+      >
         Abrir en el editor
       </ContextMenuItem>
-      <ContextMenuItem icon={<FolderOpen />} disabled={!exists} onSelect={() => void systemApi.reveal(repoId, path).catch(fail)}>
+      <ContextMenuItem
+        icon={<FolderOpen />}
+        disabled={!exists}
+        onSelect={() => void systemApi.reveal(repoId, path).catch(fail)}
+      >
         Mostrar en la carpeta
       </ContextMenuItem>
       <ContextMenuItem icon={<Copy />} onSelect={() => void copyText(path)}>

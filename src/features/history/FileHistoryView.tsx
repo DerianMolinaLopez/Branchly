@@ -13,7 +13,15 @@ import { focusCommit } from '@/features/repo/navigation';
 import { Avatar, EmptyState, IconButton, SkeletonRows } from '@/ui';
 
 /** Every commit that touched a file, with the file's diff in each one. */
-export function FileHistoryView({ repoId, path, onClose }: { repoId: string; path: string; onClose: () => void }) {
+export function FileHistoryView({
+  repoId,
+  path,
+  onClose,
+}: {
+  repoId: string;
+  path: string;
+  onClose: () => void;
+}) {
   const history = useQuery({
     queryKey: keys.history(repoId, path),
     queryFn: () => commitsApi.fileHistory(repoId, path),
@@ -29,7 +37,8 @@ export function FileHistoryView({ repoId, path, onClose }: { repoId: string; pat
     <div className="flex h-full min-h-0 flex-col">
       <header className="flex h-10 shrink-0 items-center gap-2 border-b border-line pr-2 pl-3">
         <h2 className="min-w-0 flex-1 truncate font-mono text-sm text-fg-secondary">
-          <span className="text-accent">&gt;</span> historial de <span className="text-fg">{path}</span>
+          <span className="text-accent">&gt;</span> historial de{' '}
+          <span className="text-fg">{path}</span>
           {history.data && <span className="ml-2 text-fg-subtle">{entries.length} commits</span>}
         </h2>
         <IconButton label="Cerrar" shortcut={SHORTCUTS.close} icon={<X />} onClick={onClose} />
@@ -37,16 +46,24 @@ export function FileHistoryView({ repoId, path, onClose }: { repoId: string; pat
       {history.isPending ? (
         <SkeletonRows count={10} className="p-4" />
       ) : history.isError ? (
-        <EmptyState tone="error" title="no se pudo leer el historial" description={history.error.message} />
+        <EmptyState
+          tone="error"
+          title="no se pudo leer el historial"
+          description={history.error.message}
+        />
       ) : entries.length === 0 || !entry ? (
-        <EmptyState title="sin historial" description="Ningún commit alcanzable desde HEAD modificó este archivo." />
+        <EmptyState
+          title="sin historial"
+          description="Ningún commit alcanzable desde HEAD modificó este archivo."
+        />
       ) : (
         <div className="flex min-h-0 flex-1">
           <ol
             aria-label="Commits que modificaron el archivo"
             className="w-80 shrink-0 overflow-y-auto border-r border-line p-1.5"
             onKeyDown={(event) => {
-              if (event.key === 'ArrowDown') setSelected((s) => Math.min(entries.length - 1, s + 1));
+              if (event.key === 'ArrowDown')
+                setSelected((s) => Math.min(entries.length - 1, s + 1));
               if (event.key === 'ArrowUp') setSelected((s) => Math.max(0, s - 1));
             }}
           >
@@ -66,12 +83,21 @@ export function FileHistoryView({ repoId, path, onClose }: { repoId: string; pat
                       index === selected ? 'bg-accent-soft' : 'hover:bg-raised',
                     )}
                   >
-                    <Avatar name={item.commit.author.name} email={item.commit.author.email} size="sm" className="mt-0.5" />
+                    <Avatar
+                      name={item.commit.author.name}
+                      email={item.commit.author.email}
+                      size="sm"
+                      className="mt-0.5"
+                    />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-base text-fg-secondary">{item.commit.summary}</span>
+                      <span className="block truncate text-base text-fg-secondary">
+                        {item.commit.summary}
+                      </span>
                       <span className="flex gap-2 text-xs text-fg-muted">
                         <span className="font-mono">{item.commit.shortId}</span>
-                        <span title={formatAbsolute(item.commit.author.timestamp)}>{formatRelative(item.commit.author.timestamp)}</span>
+                        <span title={formatAbsolute(item.commit.author.timestamp)}>
+                          {formatRelative(item.commit.author.timestamp)}
+                        </span>
                         <span className={kind.className}>{kind.label.toLowerCase()}</span>
                       </span>
                     </span>

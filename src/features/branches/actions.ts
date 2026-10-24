@@ -1,4 +1,11 @@
-import { branchesApi, remotesApi, stashApi, type GitError, type MergeOutcome, type Mutation } from '@/api';
+import {
+  branchesApi,
+  remotesApi,
+  stashApi,
+  type GitError,
+  type MergeOutcome,
+  type Mutation,
+} from '@/api';
 import { confirm } from '@/features/dialogs/confirm';
 import { openDialog } from '@/features/dialogs/store';
 import { runAction, runRemote } from '@/features/repo/actions';
@@ -86,16 +93,21 @@ export async function deleteBranch(repoId: string, name: string): Promise<void> 
 export async function deleteRemoteBranch(repoId: string, name: string): Promise<void> {
   const ok = await confirm({
     title: `Eliminar «${name}» del remoto`,
-    description: 'La rama se borra del servidor para todos los colaboradores. Esta acción no se puede deshacer desde Branchly.',
+    description:
+      'La rama se borra del servidor para todos los colaboradores. Esta acción no se puede deshacer desde Branchly.',
     consequences: [`La rama remota ${name}`],
     confirmLabel: 'Eliminar del remoto',
   });
   if (!ok) return;
-  await runRemote(repoId, (opId, onProgress) => remotesApi.deleteBranch(repoId, name, opId, onProgress), {
-    kind: 'remote',
-    label: `Eliminando ${name}…`,
-    done: `Rama remota ${name} eliminada`,
-  });
+  await runRemote(
+    repoId,
+    (opId, onProgress) => remotesApi.deleteBranch(repoId, name, opId, onProgress),
+    {
+      kind: 'remote',
+      label: `Eliminando ${name}…`,
+      done: `Rama remota ${name} eliminada`,
+    },
+  );
 }
 
 function mergeMessage(outcome: MergeOutcome, source: string): string | null {
@@ -112,7 +124,11 @@ function mergeMessage(outcome: MergeOutcome, source: string): string | null {
 }
 
 /** Merges `source` into the current branch, reporting conflicts. */
-export async function mergeIntoCurrent(repoId: string, source: string, noFf = false): Promise<void> {
+export async function mergeIntoCurrent(
+  repoId: string,
+  source: string,
+  noFf = false,
+): Promise<void> {
   const result = await runAction<Mutation<MergeOutcome>>(
     repoId,
     () => branchesApi.merge(repoId, source, { noFf }),

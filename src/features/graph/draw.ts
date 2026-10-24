@@ -81,7 +81,12 @@ export function drawGraph(ctx: CanvasRenderingContext2D, params: DrawParams): vo
   });
 }
 
-function drawNode(ctx: CanvasRenderingContext2D, row: GraphRow, offset: number, params: DrawParams) {
+function drawNode(
+  ctx: CanvasRenderingContext2D,
+  row: GraphRow,
+  offset: number,
+  params: DrawParams,
+) {
   const { palette } = params;
   const x = laneX(row.column);
   const y = rowCenterY(offset);
@@ -123,7 +128,11 @@ function drawNode(ctx: CanvasRenderingContext2D, row: GraphRow, offset: number, 
   }
 }
 
-function drawWip(ctx: CanvasRenderingContext2D, params: DrawParams, wip: { column: number; connect: boolean }) {
+function drawWip(
+  ctx: CanvasRenderingContext2D,
+  params: DrawParams,
+  wip: { column: number; connect: boolean },
+) {
   const x = laneX(wip.column);
   const y = rowCenterY(params.firstOffset - 1);
   ctx.save();

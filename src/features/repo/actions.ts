@@ -1,4 +1,13 @@
-import { commitsApi, GitError, keys, remotesApi, repositoriesApi, type Progress, type RemoteOutcome, type UndoHandle } from '@/api';
+import {
+  commitsApi,
+  GitError,
+  keys,
+  remotesApi,
+  repositoriesApi,
+  type Progress,
+  type RemoteOutcome,
+  type UndoHandle,
+} from '@/api';
 import { queryClient } from '@/app/queryClient';
 import { operationId } from '@/lib/id';
 import { useOperations, type OperationKind } from '@/stores/operations';
@@ -16,8 +25,10 @@ interface ActionOptions<T> {
 
 function undoHandleOf(value: unknown): UndoHandle | null {
   if (typeof value === 'object' && value !== null && 'undo' in value) {
-    const handle = (value as { undo: unknown }).undo;
-    if (typeof handle === 'object' && handle !== null && 'id' in handle) return handle as UndoHandle;
+    const handle = value.undo;
+    if (typeof handle === 'object' && handle !== null && 'id' in handle && 'label' in handle) {
+      return handle as UndoHandle;
+    }
   }
   return null;
 }
@@ -40,7 +51,8 @@ export async function runAction<T>(
     const value = await task();
     const handle = undoHandleOf(value);
     if (handle) useUndoStore.getState().set(repoId, handle);
-    const message = typeof options.success === 'function' ? options.success(value) : options.success;
+    const message =
+      typeof options.success === 'function' ? options.success(value) : options.success;
     if (message) {
       toast.success(message, {
         action: handle
@@ -138,7 +150,9 @@ export async function runRemote(
     if (error.code === 'CANCELLED') {
       toast.info('Operación cancelada');
     } else {
-      toast.error(`Falló: ${options.label.replace(/…$/, '').toLowerCase()}`, { description: error.message });
+      toast.error(`Falló: ${options.label.replace(/…$/, '').toLowerCase()}`, {
+        description: error.message,
+      });
     }
     return undefined;
   } finally {

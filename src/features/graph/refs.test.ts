@@ -5,14 +5,24 @@ import { groupRefs, remoteBranchName } from './refs';
 const label = (name: string, kind: RefLabel['kind'], isHead = false): RefLabel => ({
   name,
   fullName:
-    kind === 'localBranch' ? `refs/heads/${name}` : kind === 'remoteBranch' ? `refs/remotes/${name}` : kind === 'tag' ? `refs/tags/${name}` : 'HEAD',
+    kind === 'localBranch'
+      ? `refs/heads/${name}`
+      : kind === 'remoteBranch'
+        ? `refs/remotes/${name}`
+        : kind === 'tag'
+          ? `refs/tags/${name}`
+          : 'HEAD',
   kind,
   isHead,
 });
 
 describe('groupRefs', () => {
   it('merges a local branch with its remote copies', () => {
-    const groups = groupRefs([label('origin/main', 'remoteBranch'), label('main', 'localBranch', true), label('upstream/main', 'remoteBranch')]);
+    const groups = groupRefs([
+      label('origin/main', 'remoteBranch'),
+      label('main', 'localBranch', true),
+      label('upstream/main', 'remoteBranch'),
+    ]);
     expect(groups).toHaveLength(1);
     expect(groups[0]?.name).toBe('main');
     expect(groups[0]?.isHead).toBe(true);
@@ -26,7 +36,11 @@ describe('groupRefs', () => {
   });
 
   it('orders head first and tags last', () => {
-    const groups = groupRefs([label('v1', 'tag'), label('dev', 'localBranch'), label('main', 'localBranch', true)]);
+    const groups = groupRefs([
+      label('v1', 'tag'),
+      label('dev', 'localBranch'),
+      label('main', 'localBranch', true),
+    ]);
     expect(groups.map((g) => g.name)).toEqual(['main', 'dev', 'v1']);
   });
 

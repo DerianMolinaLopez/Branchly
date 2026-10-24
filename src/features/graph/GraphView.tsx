@@ -1,11 +1,26 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from 'react';
 import type { GraphRow, WorkingTreeStatus } from '@/api';
 import { cn } from '@/lib/cn';
 import { formatAbsolute, formatRelative } from '@/lib/time';
 import { useCurrentBranch, useStatus } from '@/features/repo/queries';
 import { useRepoUi, useWorkspace } from '@/stores/workspace';
-import { Avatar, ContextMenu, ContextMenuContent, ContextMenuTrigger, EmptyState, Skeleton } from '@/ui';
+import {
+  Avatar,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
+  EmptyState,
+  Skeleton,
+} from '@/ui';
 import { CommitMenuItems } from './CommitMenu';
 import { REFS_COLUMN_WIDTH, ROW_HEIGHT } from './constants';
 import { drawGraph, readPalette, type GraphPalette } from './draw';
@@ -15,7 +30,7 @@ import { RefChips } from './RefChips';
 import { useGraphInfo, useGraphRows } from './useGraph';
 
 function hasChanges(status: WorkingTreeStatus | undefined): boolean {
-  return !!status && (status.staged.length + status.unstaged.length + status.conflicted.length > 0);
+  return !!status && status.staged.length + status.unstaged.length + status.conflicted.length > 0;
 }
 
 /**
@@ -67,7 +82,10 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
     paletteRef.current ??= readPalette(canvas);
     const dpr = window.devicePixelRatio || 1;
     const height = (lastVirtual - firstVirtual + 1) * ROW_HEIGHT;
-    if (canvas.width !== Math.round(graphWidth * dpr) || canvas.height !== Math.round(height * dpr)) {
+    if (
+      canvas.width !== Math.round(graphWidth * dpr) ||
+      canvas.height !== Math.round(height * dpr)
+    ) {
       canvas.width = Math.round(graphWidth * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.width = `${graphWidth}px`;
@@ -157,7 +175,11 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
       <div className="flex h-10 shrink-0 items-center gap-3 border-b border-line px-3">
         <h2 className="font-mono text-sm text-fg-secondary">
           <span className="text-accent">&gt;</span> historial
-          {info.data && <span className="ml-2 text-fg-subtle">{info.data.total.toLocaleString('es')} commits</span>}
+          {info.data && (
+            <span className="ml-2 text-fg-subtle">
+              {info.data.total.toLocaleString('es')} commits
+            </span>
+          )}
         </h2>
         <div className="flex-1" />
         <GraphSearch repoId={repoId} onMatches={onMatches} focusToken={searchToken} />
@@ -177,7 +199,11 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
       </div>
 
       {info.isError ? (
-        <EmptyState tone="error" title="no se pudo leer el historial" description={info.error.message} />
+        <EmptyState
+          tone="error"
+          title="no se pudo leer el historial"
+          description={info.error.message}
+        />
       ) : empty ? (
         <EmptyState
           title="sin commits todavía"
@@ -237,7 +263,10 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
             </div>
           )}
           {rowsError && (
-            <p role="alert" className="sticky bottom-0 bg-danger-soft px-3 py-1 text-sm text-danger">
+            <p
+              role="alert"
+              className="sticky bottom-0 bg-danger-soft px-3 py-1 text-sm text-danger"
+            >
               {rowsError.message}
             </p>
           )}
@@ -276,7 +305,11 @@ const CommitRow = memo(function CommitRow({
   current,
   onSelect,
 }: CommitRowProps) {
-  const style = { transform: `translateY(${top}px)`, height: ROW_HEIGHT, gridTemplateColumns: columns };
+  const style = {
+    transform: `translateY(${top}px)`,
+    height: ROW_HEIGHT,
+    gridTemplateColumns: columns,
+  };
   if (!row) {
     return (
       <div className="absolute inset-x-0 top-0 grid items-center" style={style} aria-hidden>
@@ -311,7 +344,13 @@ const CommitRow = memo(function CommitRow({
           style={style}
         >
           <div className="relative z-[2] min-w-0 pr-1 pl-3">
-            <RefChips repoId={repoId} labels={row.refs} sha={commit.id} color={row.color} current={current} />
+            <RefChips
+              repoId={repoId}
+              labels={row.refs}
+              sha={commit.id}
+              color={row.color}
+              current={current}
+            />
           </div>
           <span />
           <span
@@ -327,7 +366,10 @@ const CommitRow = memo(function CommitRow({
             <Avatar name={commit.author.name} email={commit.author.email} size="sm" />
             <span className="truncate text-sm text-fg-muted">{commit.author.name}</span>
           </span>
-          <span className="relative z-[2] truncate text-sm text-fg-muted" title={formatAbsolute(commit.author.timestamp)}>
+          <span
+            className="relative z-[2] truncate text-sm text-fg-muted"
+            title={formatAbsolute(commit.author.timestamp)}
+          >
             {formatRelative(commit.author.timestamp)}
           </span>
           <span className="relative z-[2] font-mono text-xs text-fg-subtle group-hover:text-fg-muted">
@@ -367,9 +409,14 @@ function WipRow({
       className={cn(
         'absolute inset-x-0 top-0 grid items-center',
         'before:absolute before:inset-0 hover:before:bg-accent-faint',
-        selected && 'before:bg-accent-soft before:shadow-[inset_2px_0_0_var(--color-accent)] hover:before:bg-accent-soft',
+        selected &&
+          'before:bg-accent-soft before:shadow-[inset_2px_0_0_var(--color-accent)] hover:before:bg-accent-soft',
       )}
-      style={{ transform: `translateY(${top}px)`, height: ROW_HEIGHT, gridTemplateColumns: columns }}
+      style={{
+        transform: `translateY(${top}px)`,
+        height: ROW_HEIGHT,
+        gridTemplateColumns: columns,
+      }}
     >
       <span />
       <span />
@@ -389,12 +436,18 @@ function GraphSkeleton({ columns }: { columns: string }) {
   return (
     <div role="status" aria-label="Cargando historial">
       {Array.from({ length: 14 }, (_, i) => (
-        <div key={i} className="grid items-center" style={{ height: ROW_HEIGHT, gridTemplateColumns: columns }}>
+        <div
+          key={i}
+          className="grid items-center"
+          style={{ height: ROW_HEIGHT, gridTemplateColumns: columns }}
+        >
           <span />
           <span className="flex justify-start pl-4">
             <Skeleton className="size-2.5 rounded-full" />
           </span>
-          <Skeleton className={cn('mx-2 h-2.5', i % 3 === 0 ? 'w-1/2' : i % 3 === 1 ? 'w-2/3' : 'w-2/5')} />
+          <Skeleton
+            className={cn('mx-2 h-2.5', i % 3 === 0 ? 'w-1/2' : i % 3 === 1 ? 'w-2/3' : 'w-2/5')}
+          />
           <Skeleton className="h-2.5 w-24" />
           <Skeleton className="h-2.5 w-14" />
           <Skeleton className="h-2.5 w-12" />

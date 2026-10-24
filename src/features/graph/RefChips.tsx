@@ -17,7 +17,13 @@ interface RefChipsProps {
 }
 
 /** Branch and tag chips of a commit; the first fits, the rest collapse into "+N". */
-export const RefChips = memo(function RefChips({ repoId, labels, sha, color, current }: RefChipsProps) {
+export const RefChips = memo(function RefChips({
+  repoId,
+  labels,
+  sha,
+  color,
+  current,
+}: RefChipsProps) {
   if (labels.length === 0) return null;
   const groups = groupRefs(labels);
   const [first, ...rest] = groups;

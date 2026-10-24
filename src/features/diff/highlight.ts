@@ -46,9 +46,37 @@ function loadHljs(): Promise<HljsApi> {
       import('highlight.js/lib/languages/diff'),
     ]);
     const names = [
-      'typescript', 'javascript', 'json', 'css', 'scss', 'less', 'xml', 'markdown', 'rust', 'python',
-      'go', 'java', 'kotlin', 'c', 'cpp', 'csharp', 'php', 'ruby', 'bash', 'yaml', 'ini', 'sql',
-      'swift', 'lua', 'dart', 'scala', 'elixir', 'dockerfile', 'makefile', 'cmake', 'diff',
+      'typescript',
+      'javascript',
+      'json',
+      'css',
+      'scss',
+      'less',
+      'xml',
+      'markdown',
+      'rust',
+      'python',
+      'go',
+      'java',
+      'kotlin',
+      'c',
+      'cpp',
+      'csharp',
+      'php',
+      'ruby',
+      'bash',
+      'yaml',
+      'ini',
+      'sql',
+      'swift',
+      'lua',
+      'dart',
+      'scala',
+      'elixir',
+      'dockerfile',
+      'makefile',
+      'cmake',
+      'diff',
     ];
     langs.forEach((lang, i) => {
       const name = names[i];
@@ -85,7 +113,9 @@ export function useHighlighter(language: string | null): Highlighter | null {
       let html = cache.get(code);
       if (html === undefined) {
         html =
-          code.length > 2000 ? escape(code) : hljs.highlight(code, { language, ignoreIllegals: true }).value;
+          code.length > 2000
+            ? escape(code)
+            : hljs.highlight(code, { language, ignoreIllegals: true }).value;
         cache.set(code, html);
       }
       return html;

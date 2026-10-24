@@ -34,7 +34,15 @@ import { useSettings } from '@/stores/settings';
 import type { DiffSource } from '@/stores/workspace';
 import { Button, EmptyState, IconButton, SegmentedControl, SkeletonRows, toast } from '@/ui';
 import { useHighlighter } from './highlight';
-import { changeBlocks, expandTabs, longestLine, splitRows, unifiedRows, type SplitRow, type UnifiedRow } from './rows';
+import {
+  changeBlocks,
+  expandTabs,
+  longestLine,
+  splitRows,
+  unifiedRows,
+  type SplitRow,
+  type UnifiedRow,
+} from './rows';
 
 const LINE_HEIGHT = 20;
 const HUNK_HEIGHT = 30;
@@ -72,9 +80,13 @@ export function DiffView({
   const active = useRepoActive();
 
   useHotkey(SHORTCUTS.close, () => onClose?.(), active && onClose !== undefined);
-  useHotkey(SHORTCUTS.toggleDiffMode, () => {
-    setMode(mode === 'unified' ? 'split' : 'unified');
-  }, active);
+  useHotkey(
+    SHORTCUTS.toggleDiffMode,
+    () => {
+      setMode(mode === 'unified' ? 'split' : 'unified');
+    },
+    active,
+  );
 
   const { dir, name } = splitPath(source.path);
   const kind = diff.data ? CHANGE_KIND[diff.data.kind] : null;
@@ -83,19 +95,32 @@ export function DiffView({
     <div className="flex h-full min-h-0 flex-col bg-canvas/40">
       <header className="flex h-10 shrink-0 items-center gap-2 border-b border-line pr-2 pl-3">
         {kind && (
-          <span className={cn('font-mono text-xs font-semibold', kind.className)} title={kind.label}>
+          <span
+            className={cn('font-mono text-xs font-semibold', kind.className)}
+            title={kind.label}
+          >
             {kind.letter}
           </span>
         )}
-        <h2 className="min-w-0 flex-1 truncate font-mono text-sm" title={source.path} data-selectable>
+        <h2
+          className="min-w-0 flex-1 truncate font-mono text-sm"
+          title={source.path}
+          data-selectable
+        >
           <span className="text-fg-subtle">{dir}</span>
           <span className="text-fg">{name}</span>
-          {diff.data?.oldPath && <span className="ml-2 text-fg-subtle">desde {diff.data.oldPath}</span>}
+          {diff.data?.oldPath && (
+            <span className="ml-2 text-fg-subtle">desde {diff.data.oldPath}</span>
+          )}
           {source.type === 'working' && (
-            <span className="ml-2 font-sans text-xs text-fg-muted">{source.staged ? 'preparado' : 'sin preparar'}</span>
+            <span className="ml-2 font-sans text-xs text-fg-muted">
+              {source.staged ? 'preparado' : 'sin preparar'}
+            </span>
           )}
         </h2>
-        {source.type === 'working' && <FileActions repoId={repoId} path={source.path} staged={source.staged} />}
+        {source.type === 'working' && (
+          <FileActions repoId={repoId} path={source.path} staged={source.staged} />
+        )}
         <SegmentedControl
           label="Modo del diff"
           value={mode}
@@ -116,15 +141,24 @@ export function DiffView({
             }}
           />
         )}
-        {onClose && <IconButton label="Cerrar" shortcut={SHORTCUTS.close} icon={<X />} onClick={onClose} />}
+        {onClose && (
+          <IconButton label="Cerrar" shortcut={SHORTCUTS.close} icon={<X />} onClick={onClose} />
+        )}
       </header>
 
       {diff.isPending ? (
         <SkeletonRows count={12} className="p-4" />
       ) : diff.isError ? (
-        <EmptyState tone="error" title="no se pudo cargar el diff" description={diff.error.message} />
+        <EmptyState
+          tone="error"
+          title="no se pudo cargar el diff"
+          description={diff.error.message}
+        />
       ) : diff.data.binary ? (
-        <EmptyState title="archivo binario" description="Branchly no muestra el contenido de archivos binarios." />
+        <EmptyState
+          title="archivo binario"
+          description="Branchly no muestra el contenido de archivos binarios."
+        />
       ) : diff.data.hunks.length === 0 ? (
         <EmptyState
           title="sin cambios de contenido"
@@ -144,7 +178,12 @@ export function DiffView({
 function FileActions({ repoId, path, staged }: { repoId: string; path: string; staged: boolean }) {
   if (staged) {
     return (
-      <Button size="sm" variant="ghost" icon={<Minus />} onClick={() => void runAction(repoId, () => stagingApi.unstage(repoId, [path]))}>
+      <Button
+        size="sm"
+        variant="ghost"
+        icon={<Minus />}
+        onClick={() => void runAction(repoId, () => stagingApi.unstage(repoId, [path]))}
+      >
         Quitar del stage
       </Button>
     );
@@ -162,12 +201,20 @@ function FileActions({ repoId, path, staged }: { repoId: string; path: string; s
             consequences: [`Todos los cambios sin preparar de ${path}`],
             confirmLabel: 'Descartar cambios',
           });
-          if (ok) await runAction(repoId, () => stagingApi.discard(repoId, [path]), { success: 'Cambios descartados' });
+          if (ok)
+            await runAction(repoId, () => stagingApi.discard(repoId, [path]), {
+              success: 'Cambios descartados',
+            });
         }}
       >
         Descartar
       </Button>
-      <Button size="sm" variant="ghost" icon={<Plus />} onClick={() => void runAction(repoId, () => stagingApi.stage(repoId, [path]))}>
+      <Button
+        size="sm"
+        variant="ghost"
+        icon={<Plus />}
+        onClick={() => void runAction(repoId, () => stagingApi.stage(repoId, [path]))}
+      >
         Preparar archivo
       </Button>
     </>
@@ -187,7 +234,10 @@ function DiffBody({
   mode: 'unified' | 'split';
   active: boolean;
 }) {
-  const rows = useMemo(() => (mode === 'unified' ? unifiedRows(diff) : splitRows(diff)), [diff, mode]);
+  const rows = useMemo(
+    () => (mode === 'unified' ? unifiedRows(diff) : splitRows(diff)),
+    [diff, mode],
+  );
   const blocks = useMemo(() => changeBlocks(rows), [rows]);
   const highlight = useHighlighter(languageFor(diff.path));
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -202,7 +252,12 @@ function DiffBody({
 
   const goTo = (delta: number) => {
     if (blocks.length === 0) return;
-    const next = block === -1 ? (delta > 0 ? 0 : blocks.length - 1) : (block + delta + blocks.length) % blocks.length;
+    const next =
+      block === -1
+        ? delta > 0
+          ? 0
+          : blocks.length - 1
+        : (block + delta + blocks.length) % blocks.length;
     setBlock(next);
     const row = blocks[next];
     if (row !== undefined) virtualizer.scrollToIndex(row, { align: 'center' });
@@ -219,10 +274,24 @@ function DiffBody({
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div className="absolute top-2 right-4 z-10 flex items-center gap-0.5 rounded-control border border-line bg-raised/95 p-0.5 shadow-overlay">
         <span className="px-1.5 font-mono text-xs text-fg-muted tabular-nums">
-          {blocks.length === 0 ? 'sin cambios' : `${block === -1 ? '–' : block + 1}/${blocks.length}`}
+          {blocks.length === 0
+            ? 'sin cambios'
+            : `${block === -1 ? '–' : block + 1}/${blocks.length}`}
         </span>
-        <IconButton size="sm" label="Cambio anterior" shortcut={SHORTCUTS.prevChange} icon={<ChevronUp />} onClick={() => goTo(-1)} />
-        <IconButton size="sm" label="Cambio siguiente" shortcut={SHORTCUTS.nextChange} icon={<ChevronDown />} onClick={() => goTo(1)} />
+        <IconButton
+          size="sm"
+          label="Cambio anterior"
+          shortcut={SHORTCUTS.prevChange}
+          icon={<ChevronUp />}
+          onClick={() => goTo(-1)}
+        />
+        <IconButton
+          size="sm"
+          label="Cambio siguiente"
+          shortcut={SHORTCUTS.nextChange}
+          icon={<ChevronDown />}
+          onClick={() => goTo(1)}
+        />
       </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto" data-selectable>
         <div className="relative" style={{ height: virtualizer.getTotalSize(), minWidth }}>
@@ -236,7 +305,13 @@ function DiffBody({
                 style={{ transform: `translateY(${item.start}px)`, height: item.size }}
               >
                 {row.type === 'hunk' ? (
-                  <HunkHeader repoId={repoId} diff={diff} hunk={row.hunk} header={row.header} working={working} />
+                  <HunkHeader
+                    repoId={repoId}
+                    diff={diff}
+                    hunk={row.hunk}
+                    header={row.header}
+                    working={working}
+                  />
                 ) : row.type === 'line' ? (
                   <UnifiedLine line={row.line} highlight={highlight} />
                 ) : (
@@ -271,7 +346,13 @@ function HunkHeader({
 }) {
   const data = diff.hunks[hunk];
   const ref: HunkRef | null = data
-    ? { index: hunk, oldStart: data.oldStart, oldLines: data.oldLines, newStart: data.newStart, newLines: data.newLines }
+    ? {
+        index: hunk,
+        oldStart: data.oldStart,
+        oldLines: data.oldLines,
+        newStart: data.newStart,
+        newLines: data.newLines,
+      }
     : null;
   const run = (task: () => Promise<null>, errorTitle: string) => {
     void runAction(repoId, task, { errorTitle });
@@ -283,7 +364,17 @@ function HunkHeader({
       {working && ref && (
         <span className="flex shrink-0 gap-1">
           {working.staged ? (
-            <Button size="sm" variant="ghost" icon={<Minus />} onClick={() => run(() => stagingApi.unstageHunk(repoId, working.path, ref), 'No se pudo quitar el bloque')}>
+            <Button
+              size="sm"
+              variant="ghost"
+              icon={<Minus />}
+              onClick={() =>
+                run(
+                  () => stagingApi.unstageHunk(repoId, working.path, ref),
+                  'No se pudo quitar el bloque',
+                )
+              }
+            >
               Quitar bloque
             </Button>
           ) : (
@@ -298,15 +389,31 @@ function HunkHeader({
                   const ok = await confirm({
                     title: 'Descartar este bloque',
                     description: `El bloque ${header.split('@@')[1]?.trim() ?? ''} vuelve a su versión anterior.`,
-                    consequences: [`${added} línea(s) añadidas y ${removed} eliminadas en ${working.path}`],
+                    consequences: [
+                      `${added} línea(s) añadidas y ${removed} eliminadas en ${working.path}`,
+                    ],
                     confirmLabel: 'Descartar bloque',
                   });
-                  if (ok) run(() => stagingApi.discardHunk(repoId, working.path, ref), 'No se pudo descartar el bloque');
+                  if (ok)
+                    run(
+                      () => stagingApi.discardHunk(repoId, working.path, ref),
+                      'No se pudo descartar el bloque',
+                    );
                 }}
               >
                 Descartar
               </Button>
-              <Button size="sm" variant="ghost" icon={<Plus />} onClick={() => run(() => stagingApi.stageHunk(repoId, working.path, ref), 'No se pudo preparar el bloque')}>
+              <Button
+                size="sm"
+                variant="ghost"
+                icon={<Plus />}
+                onClick={() =>
+                  run(
+                    () => stagingApi.stageHunk(repoId, working.path, ref),
+                    'No se pudo preparar el bloque',
+                  )
+                }
+              >
                 Preparar bloque
               </Button>
             </>
@@ -318,18 +425,37 @@ function HunkHeader({
 }
 
 const lineTone = {
-  added: { row: 'bg-diff-add-bg', gutter: 'bg-diff-add-gutter text-diff-add/80', sign: 'text-diff-add', mark: '+' },
-  deleted: { row: 'bg-diff-del-bg', gutter: 'bg-diff-del-gutter text-diff-del/80', sign: 'text-diff-del', mark: '−' },
+  added: {
+    row: 'bg-diff-add-bg',
+    gutter: 'bg-diff-add-gutter text-diff-add/80',
+    sign: 'text-diff-add',
+    mark: '+',
+  },
+  deleted: {
+    row: 'bg-diff-del-bg',
+    gutter: 'bg-diff-del-gutter text-diff-del/80',
+    sign: 'text-diff-del',
+    mark: '−',
+  },
   context: { row: '', gutter: 'text-fg-subtle', sign: 'text-fg-subtle', mark: ' ' },
 } as const;
 
-function Code({ line, highlight }: { line: DiffLine; highlight: ((code: string) => string) | null }) {
+function Code({
+  line,
+  highlight,
+}: {
+  line: DiffLine;
+  highlight: ((code: string) => string) | null;
+}) {
   const text = expandTabs(line.content);
   return (
     <span className="pr-4 whitespace-pre text-fg-secondary">
       {highlight ? <span dangerouslySetInnerHTML={{ __html: highlight(text) }} /> : text}
       {line.noNewline && (
-        <span className="ml-2 text-2xs text-fg-subtle select-none" title="Sin salto de línea al final del archivo">
+        <span
+          className="ml-2 text-2xs text-fg-subtle select-none"
+          title="Sin salto de línea al final del archivo"
+        >
           ⏎̸
         </span>
       )}
@@ -348,8 +474,12 @@ const UnifiedLine = memo(function UnifiedLine({
   return (
     <div className={cn('flex h-5 font-mono text-sm leading-5', tone.row)}>
       <span className={cn('sticky left-0 flex shrink-0 select-none', tone.gutter)}>
-        <span className="w-12 bg-canvas/40 pr-2 text-right text-xs leading-5">{line.oldLine ?? ''}</span>
-        <span className="w-12 bg-canvas/40 pr-2 text-right text-xs leading-5">{line.newLine ?? ''}</span>
+        <span className="w-12 bg-canvas/40 pr-2 text-right text-xs leading-5">
+          {line.oldLine ?? ''}
+        </span>
+        <span className="w-12 bg-canvas/40 pr-2 text-right text-xs leading-5">
+          {line.newLine ?? ''}
+        </span>
       </span>
       <span className={cn('w-5 shrink-0 text-center select-none', tone.sign)}>{tone.mark}</span>
       <Code line={line} highlight={highlight} />
@@ -367,7 +497,12 @@ const SplitPair = memo(function SplitPair({
   return (
     <div className="grid h-5 grid-cols-2 font-mono text-sm leading-5">
       <SplitSide line={row.left} number={row.left?.oldLine ?? null} highlight={highlight} />
-      <SplitSide line={row.right} number={row.right?.newLine ?? null} highlight={highlight} border />
+      <SplitSide
+        line={row.right}
+        number={row.right?.newLine ?? null}
+        highlight={highlight}
+        border
+      />
     </div>
   );
 });
@@ -387,7 +522,12 @@ function SplitSide({
   const tone = lineTone[line.kind];
   return (
     <div className={cn('flex min-w-0 overflow-hidden', tone.row, border && 'border-l border-line')}>
-      <span className={cn('w-12 shrink-0 bg-canvas/40 pr-2 text-right text-xs leading-5 select-none', tone.gutter)}>
+      <span
+        className={cn(
+          'w-12 shrink-0 bg-canvas/40 pr-2 text-right text-xs leading-5 select-none',
+          tone.gutter,
+        )}
+      >
         {number ?? ''}
       </span>
       <span className={cn('w-5 shrink-0 text-center select-none', tone.sign)}>{tone.mark}</span>
