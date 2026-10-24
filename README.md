@@ -131,9 +131,12 @@ Medido en Linux (Fedora 44, build de release):
 |---|---|
 | Instalador `.deb` / `.rpm` | 4,1 MB |
 | Arranque hasta mostrar un repositorio abierto | ≈ 0,4 s |
-| Memoria con un repositorio de 2 340 commits abierto | ≈ 250 MB, de los que unos 170 MB son la base de WebKitGTK |
-| Gráfica de `git/git` (85 799 commits): cálculo completo | 0,90 s, una sola vez por cambio de referencias |
-| Página de 200 filas / búsqueda en todos los mensajes | 0,4 ms / 7 ms |
+| Memoria total (app + procesos de WebKitGTK), sin repositorio | ≈ 240 MB, casi todo la base del WebView |
+| Memoria con un repositorio de 2 340 commits (ripgrep) | ≈ 300 MB |
+| Memoria con `git/git` (85 799 commits) | ≈ 440 MB |
+| CPU en reposo | 0–0,5 % |
+| Gráfica de `git/git`: cálculo completo | 1,3 s, en segundo plano y solo cuando se mueve una referencia |
+| Página de 200 filas / búsqueda en todos los mensajes | 0,7 ms / 7 ms |
 | JavaScript inicial | 409 KB (130 KB gzip); diff, blame y paleta se cargan bajo demanda |
 
 ## Atajos de teclado

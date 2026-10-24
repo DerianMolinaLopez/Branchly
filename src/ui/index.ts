@@ -2,6 +2,7 @@ export * from './Avatar';
 export * from './Button';
 export * from './Checkbox';
 export * from './ContextMenu';
+export * from './Cursor';
 export * from './Dialog';
 export * from './DropdownMenu';
 export * from './EmptyState';

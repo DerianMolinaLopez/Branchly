@@ -15,7 +15,9 @@ seguir. La fuente de verdad es [`src/styles/tokens.css`](src/styles/tokens.css).
    - JetBrains Mono se reserva para identificadores de Git: hashes, ramas,
      rutas y diffs.
    - El cursor `_` parpadeante aparece solo en estados vacíos y en la pantalla
-     de inicio.
+     de inicio. Como en las terminales, deja de parpadear tras 8 s sin
+     actividad, así una ventana inactiva no consume CPU (WebKitGTK ejecuta
+     las animaciones CSS infinitas a frecuencia de refresco completa).
 3. **El texto en minúsculas iniciales y sin adornos.** Nada de etiquetas en
    mayúsculas con tracking, ni de flechas añadidas a los botones. Los botones
    dicen exactamente lo que hacen ("Preparar bloque", "Eliminar rama") y el

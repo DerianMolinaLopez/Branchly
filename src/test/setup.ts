@@ -20,3 +20,15 @@ Object.assign(Element.prototype, {
   hasPointerCapture: () => false,
   releasePointerCapture: () => undefined,
 });
+Object.assign(window, {
+  matchMedia: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    dispatchEvent: () => false,
+  }),
+});

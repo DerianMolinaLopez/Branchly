@@ -8,7 +8,7 @@ import { cn } from '@/lib/cn';
 import { SHORTCUTS } from '@/lib/shortcuts';
 import { formatRelative } from '@/lib/time';
 import { openDialog } from '@/features/dialogs/store';
-import { IconButton, Kbd, SectionTitle, Skeleton } from '@/ui';
+import { Cursor, IconButton, Kbd, SectionTitle, Skeleton } from '@/ui';
 import { openRepository, pickAndOpenRepository } from './openRepo';
 
 /** Start screen: open, clone or create a repository, or reopen a recent one. */
@@ -40,9 +40,7 @@ export function HomeScreen() {
           />
           <h1 className="font-mono text-display font-semibold tracking-tight text-fg">
             <span className="text-accent">&gt;</span> <TypedWord word="branchly" />
-            <span className="animate-blink text-accent" aria-hidden>
-              _
-            </span>
+            <Cursor />
           </h1>
         </div>
         <p className="mt-3 max-w-xl text-md text-fg-muted">

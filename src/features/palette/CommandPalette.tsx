@@ -1,6 +1,6 @@
 import { Command } from 'cmdk';
 import { useMemo } from 'react';
-import { Kbd } from '@/ui';
+import { Cursor, Kbd } from '@/ui';
 import { useAppCommands, type CommandSection } from './commands';
 import { usePalette } from './store';
 
@@ -43,7 +43,8 @@ export function CommandPalette() {
       </div>
       <Command.List className="max-h-[420px] overflow-y-auto p-1.5">
         <Command.Empty className="px-3 py-8 text-center font-mono text-base text-fg-muted">
-          sin resultados<span className="animate-blink text-accent">_</span>
+          sin resultados
+          <Cursor />
         </Command.Empty>
         {groups.map(
           ({ section, items }) =>

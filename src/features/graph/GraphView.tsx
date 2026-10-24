@@ -441,9 +441,7 @@ function WipRow({
       <span />
       <span />
       <span className="relative z-[2] col-span-4 flex min-w-0 items-center gap-3 overflow-hidden pl-2 font-mono text-sm whitespace-nowrap">
-        <span className="text-accent">
-          cambios sin confirmar<span className="animate-blink">_</span>
-        </span>
+        <span className="text-accent">cambios sin confirmar</span>
         {conflicted > 0 && <span className="text-danger">{conflicted} en conflicto</span>}
         {unstaged > 0 && <span className="text-fg-muted">{unstaged} sin preparar</span>}
         {staged > 0 && <span className="text-success">{staged} preparados</span>}

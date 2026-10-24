@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { Cursor } from './Cursor';
 
 /**
  * Empty and error states: a terminal-style prompt with a blinking cursor,
@@ -30,9 +31,7 @@ export function EmptyState({
         className={cn('font-mono text-md', tone === 'error' ? 'text-danger' : 'text-fg-secondary')}
       >
         <span className={tone === 'error' ? 'text-danger' : 'text-accent'}>&gt;</span> {title}
-        <span className="ml-0.5 animate-blink text-accent" aria-hidden>
-          _
-        </span>
+        <Cursor className="ml-0.5" />
       </p>
       {description && <div className="max-w-sm text-base text-fg-muted">{description}</div>}
       {action}
