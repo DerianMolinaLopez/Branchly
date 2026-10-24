@@ -35,7 +35,8 @@ export function CommitEditor({ repoId, status }: { repoId: string; status: Worki
   const conflicts = status.conflicted.length;
   const staged = status.staged.length;
   const summary = draft.summary.trim();
-  const canCommit = !merging && conflicts === 0 && summary.length > 0 && (draft.amend || staged > 0);
+  const canCommit =
+    !merging && conflicts === 0 && summary.length > 0 && (draft.amend || staged > 0);
 
   const toggleAmend = async (amend: boolean) => {
     update(repoId, { amend });
@@ -49,10 +50,15 @@ export function CommitEditor({ repoId, status }: { repoId: string; status: Worki
 
   const submit = async () => {
     if (!canCommit) return;
-    const result = await runAction(repoId, () => commitsApi.commit(repoId, composeMessage(draft), draft.amend), {
-      success: (m) => (draft.amend ? `Commit ${m.value.shortId} modificado` : `Commit ${m.value.shortId} creado`),
-      errorTitle: 'No se pudo hacer el commit',
-    });
+    const result = await runAction(
+      repoId,
+      () => commitsApi.commit(repoId, composeMessage(draft), draft.amend),
+      {
+        success: (m) =>
+          draft.amend ? `Commit ${m.value.shortId} modificado` : `Commit ${m.value.shortId} creado`,
+        errorTitle: 'No se pudo hacer el commit',
+      },
+    );
     if (result) clear(repoId);
   };
 
@@ -132,12 +138,20 @@ export function CommitEditor({ repoId, status }: { repoId: string; status: Worki
         icon={<GitCommitHorizontal />}
       >
         <span className="flex-1 text-left">
-          {draft.amend ? 'Modificar el commit' : staged > 0 ? `Hacer commit de ${staged} ${staged === 1 ? 'archivo' : 'archivos'}` : 'Hacer commit'}
+          {draft.amend
+            ? 'Modificar el commit'
+            : staged > 0
+              ? `Hacer commit de ${staged} ${staged === 1 ? 'archivo' : 'archivos'}`
+              : 'Hacer commit'}
         </span>
-        <Kbd shortcut={SHORTCUTS.commit} className="[&>span]:border-accent-fg/20 [&>span]:bg-accent-fg/10 [&>span]:text-accent-fg" />
+        <Kbd
+          shortcut={SHORTCUTS.commit}
+          className="[&>span]:border-accent-fg/20 [&>span]:bg-accent-fg/10 [&>span]:text-accent-fg"
+        />
       </Button>
-      {disabledReason && <p className="mt-1.5 text-center text-xs text-fg-subtle">{disabledReason}</p>}
+      {disabledReason && (
+        <p className="mt-1.5 text-center text-xs text-fg-subtle">{disabledReason}</p>
+      )}
     </form>
   );
 }
-EOF

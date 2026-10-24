@@ -1,6 +1,13 @@
 import { ExternalLink, GitMerge, Minus, Plus, Trash2, Undo2, CheckCheck } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { stagingApi, systemApi, type ConflictFile, type FileChange, type RepoState, type WorkingTreeStatus } from '@/api';
+import {
+  stagingApi,
+  systemApi,
+  type ConflictFile,
+  type FileChange,
+  type RepoState,
+  type WorkingTreeStatus,
+} from '@/api';
 import { SHORTCUTS } from '@/lib/shortcuts';
 import { FileMenuItems } from '@/features/commit/FileMenu';
 import { FileRow } from '@/features/commit/FileRow';
@@ -38,13 +45,21 @@ export function StagingPanel({ repoId }: { repoId: string }) {
   const status = useStatus(repoId);
   if (status.isPending) return <SkeletonRows count={8} className="p-4" />;
   if (status.isError) {
-    return <EmptyState tone="error" title="no se pudo leer el estado" description={status.error.message} />;
+    return (
+      <EmptyState
+        tone="error"
+        title="no se pudo leer el estado"
+        description={status.error.message}
+      />
+    );
   }
   const data = status.data;
   const clean = data.staged.length + data.unstaged.length + data.conflicted.length === 0;
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {data.state !== 'clean' && <OperationBanner repoId={repoId} status={data} state={data.state} />}
+      {data.state !== 'clean' && (
+        <OperationBanner repoId={repoId} status={data} state={data.state} />
+      )}
       <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
         {clean ? (
           <EmptyState
@@ -53,7 +68,9 @@ export function StagingPanel({ repoId }: { repoId: string }) {
           />
         ) : (
           <>
-            {data.conflicted.length > 0 && <ConflictSection repoId={repoId} files={data.conflicted} />}
+            {data.conflicted.length > 0 && (
+              <ConflictSection repoId={repoId} files={data.conflicted} />
+            )}
             <UnstagedSection repoId={repoId} files={data.unstaged} />
             <StagedSection repoId={repoId} files={data.staged} />
           </>
@@ -64,7 +81,15 @@ export function StagingPanel({ repoId }: { repoId: string }) {
   );
 }
 
-function OperationBanner({ repoId, status, state }: { repoId: string; status: WorkingTreeStatus; state: Exclude<RepoState, 'clean'> }) {
+function OperationBanner({
+  repoId,
+  status,
+  state,
+}: {
+  repoId: string;
+  status: WorkingTreeStatus;
+  state: Exclude<RepoState, 'clean'>;
+}) {
   const pending = status.conflicted.length;
   return (
     <div className="shrink-0 border-b border-warning/30 bg-warning-soft/60 px-4 py-3">
@@ -88,7 +113,10 @@ function OperationBanner({ repoId, status, state }: { repoId: string; status: Wo
               consequences: ['Las resoluciones de conflictos hechas hasta ahora'],
               confirmLabel: 'Abortar',
             });
-            if (ok) await runAction(repoId, () => stagingApi.abortOperation(repoId), { success: 'Operación abortada' });
+            if (ok)
+              await runAction(repoId, () => stagingApi.abortOperation(repoId), {
+                success: 'Operación abortada',
+              });
           }}
         >
           Abortar
@@ -97,7 +125,11 @@ function OperationBanner({ repoId, status, state }: { repoId: string; status: Wo
           size="sm"
           variant="primary"
           disabled={pending > 0}
-          onClick={() => void runAction(repoId, () => stagingApi.continueOperation(repoId), { success: 'Operación completada' })}
+          onClick={() =>
+            void runAction(repoId, () => stagingApi.continueOperation(repoId), {
+              success: 'Operación completada',
+            })
+          }
         >
           Continuar
         </Button>
@@ -106,7 +138,17 @@ function OperationBanner({ repoId, status, state }: { repoId: string; status: Wo
   );
 }
 
-function Section({ title, count, actions, children }: { title: string; count: number; actions?: ReactNode; children: ReactNode }) {
+function Section({
+  title,
+  count,
+  actions,
+  children,
+}: {
+  title: string;
+  count: number;
+  actions?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <section className="mb-3" aria-label={title}>
       <SectionTitle count={count} actions={actions} className="px-2">
@@ -121,7 +163,9 @@ function useOpenDiff(repoId: string) {
   const setCenter = useWorkspace((s) => s.setCenter);
   const { center } = useRepoUi(repoId);
   const openPath =
-    center.kind === 'diff' && center.source.type === 'working' ? `${center.source.staged}:${center.source.path}` : null;
+    center.kind === 'diff' && center.source.type === 'working'
+      ? `${center.source.staged}:${center.source.path}`
+      : null;
   return {
     isOpen: (path: string, staged: boolean) => openPath === `${staged}:${path}`,
     open: (path: string, staged: boolean) => {
@@ -133,7 +177,10 @@ function useOpenDiff(repoId: string) {
 async function discard(repoId: string, files: FileChange[]) {
   const untracked = files.filter((f) => f.kind === 'untracked');
   const ok = await confirm({
-    title: files.length === 1 ? 'Descartar los cambios del archivo' : `Descartar ${files.length} archivos`,
+    title:
+      files.length === 1
+        ? 'Descartar los cambios del archivo'
+        : `Descartar ${files.length} archivos`,
     description:
       untracked.length > 0
         ? 'Los archivos nuevos sin seguimiento se eliminarán del disco.'
@@ -142,9 +189,17 @@ async function discard(repoId: string, files: FileChange[]) {
     confirmLabel: 'Descartar cambios',
   });
   if (!ok) return;
-  await runAction(repoId, () => stagingApi.discard(repoId, files.map((f) => f.path)), {
-    success: files.length === 1 ? 'Cambios descartados' : `${files.length} archivos descartados`,
-  });
+  await runAction(
+    repoId,
+    () =>
+      stagingApi.discard(
+        repoId,
+        files.map((f) => f.path),
+      ),
+    {
+      success: files.length === 1 ? 'Cambios descartados' : `${files.length} archivos descartados`,
+    },
+  );
 }
 
 function UnstagedSection({ repoId, files }: { repoId: string; files: FileChange[] }) {
@@ -156,9 +211,20 @@ function UnstagedSection({ repoId, files }: { repoId: string; files: FileChange[
       count={files.length}
       actions={
         <>
-          <IconButton size="sm" tone="danger" label="Descartar todo" icon={<Undo2 />} onClick={() => void discard(repoId, files)} />
+          <IconButton
+            size="sm"
+            tone="danger"
+            label="Descartar todo"
+            icon={<Undo2 />}
+            onClick={() => void discard(repoId, files)}
+          />
           <Tooltip content="Preparar todo" shortcut={SHORTCUTS.stageAll}>
-            <Button size="sm" variant="ghost" icon={<Plus />} onClick={() => void runAction(repoId, () => stagingApi.stageAll(repoId))}>
+            <Button
+              size="sm"
+              variant="ghost"
+              icon={<Plus />}
+              onClick={() => void runAction(repoId, () => stagingApi.stageAll(repoId))}
+            >
               Preparar todo
             </Button>
           </Tooltip>
@@ -177,13 +243,21 @@ function UnstagedSection({ repoId, files }: { repoId: string; files: FileChange[
                 }}
                 actions={
                   <>
-                    <IconButton size="sm" tone="danger" label="Descartar cambios" icon={<Undo2 />} onClick={() => void discard(repoId, [file])} />
+                    <IconButton
+                      size="sm"
+                      tone="danger"
+                      label="Descartar cambios"
+                      icon={<Undo2 />}
+                      onClick={() => void discard(repoId, [file])}
+                    />
                     <IconButton
                       size="sm"
                       tone="accent"
                       label="Preparar archivo"
                       icon={<Plus />}
-                      onClick={() => void runAction(repoId, () => stagingApi.stage(repoId, [file.path]))}
+                      onClick={() =>
+                        void runAction(repoId, () => stagingApi.stage(repoId, [file.path]))
+                      }
                     />
                   </>
                 }
@@ -191,7 +265,10 @@ function UnstagedSection({ repoId, files }: { repoId: string; files: FileChange[
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuItem icon={<Plus />} onSelect={() => void runAction(repoId, () => stagingApi.stage(repoId, [file.path]))}>
+            <ContextMenuItem
+              icon={<Plus />}
+              onSelect={() => void runAction(repoId, () => stagingApi.stage(repoId, [file.path]))}
+            >
               Preparar
             </ContextMenuItem>
             <ContextMenuItem danger icon={<Trash2 />} onSelect={() => void discard(repoId, [file])}>
@@ -214,7 +291,12 @@ function StagedSection({ repoId, files }: { repoId: string; files: FileChange[] 
       title="preparados"
       count={files.length}
       actions={
-        <Button size="sm" variant="ghost" icon={<Minus />} onClick={() => void runAction(repoId, () => stagingApi.unstageAll(repoId))}>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={<Minus />}
+          onClick={() => void runAction(repoId, () => stagingApi.unstageAll(repoId))}
+        >
           Quitar todo
         </Button>
       }
@@ -235,7 +317,12 @@ function StagedSection({ repoId, files }: { repoId: string; files: FileChange[] 
                     label="Quitar del stage"
                     icon={<Minus />}
                     onClick={() =>
-                      void runAction(repoId, () => stagingApi.unstage(repoId, file.oldPath ? [file.oldPath, file.path] : [file.path]))
+                      void runAction(repoId, () =>
+                        stagingApi.unstage(
+                          repoId,
+                          file.oldPath ? [file.oldPath, file.path] : [file.path],
+                        ),
+                      )
                     }
                   />
                 }
@@ -243,7 +330,10 @@ function StagedSection({ repoId, files }: { repoId: string; files: FileChange[] 
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuItem icon={<Minus />} onSelect={() => void runAction(repoId, () => stagingApi.unstage(repoId, [file.path]))}>
+            <ContextMenuItem
+              icon={<Minus />}
+              onSelect={() => void runAction(repoId, () => stagingApi.unstage(repoId, [file.path]))}
+            >
               Quitar del stage
             </ContextMenuItem>
             <ContextMenuSeparator />
@@ -268,7 +358,10 @@ function ConflictSection({ repoId, files }: { repoId: string; files: ConflictFil
   return (
     <Section title="en conflicto" count={files.length}>
       {files.map((file) => (
-        <div key={file.path} className="rounded-control border border-danger/25 bg-danger-soft/30 p-1 mb-1">
+        <div
+          key={file.path}
+          className="rounded-control border border-danger/25 bg-danger-soft/30 p-1 mb-1"
+        >
           <FileRow
             file={{ path: file.path, oldPath: null, kind: 'conflicted' }}
             selected={diff.isOpen(file.path, false)}
@@ -277,17 +370,37 @@ function ConflictSection({ repoId, files }: { repoId: string; files: ConflictFil
             }}
           />
           <div className="flex flex-wrap gap-1 px-1 pt-1 pb-0.5">
-            <Tooltip content={file.hasOurs ? 'Mantener la versión de tu rama (HEAD)' : 'Tu rama eliminó el archivo'}>
-              <Button size="sm" variant="secondary" onClick={() => {
-                resolve(file, 'ours');
-              }}>
+            <Tooltip
+              content={
+                file.hasOurs
+                  ? 'Mantener la versión de tu rama (HEAD)'
+                  : 'Tu rama eliminó el archivo'
+              }
+            >
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  resolve(file, 'ours');
+                }}
+              >
                 Usar la actual
               </Button>
             </Tooltip>
-            <Tooltip content={file.hasTheirs ? 'Mantener la versión que se está fusionando' : 'La rama entrante eliminó el archivo'}>
-              <Button size="sm" variant="secondary" onClick={() => {
-                resolve(file, 'theirs');
-              }}>
+            <Tooltip
+              content={
+                file.hasTheirs
+                  ? 'Mantener la versión que se está fusionando'
+                  : 'La rama entrante eliminó el archivo'
+              }
+            >
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  resolve(file, 'theirs');
+                }}
+              >
                 Usar la entrante
               </Button>
             </Tooltip>
@@ -306,7 +419,11 @@ function ConflictSection({ repoId, files }: { repoId: string; files: ConflictFil
               tone="accent"
               label="Marcar como resuelto"
               icon={<CheckCheck />}
-              onClick={() => void runAction(repoId, () => stagingApi.markResolved(repoId, file.path), { success: `${file.path} resuelto` })}
+              onClick={() =>
+                void runAction(repoId, () => stagingApi.markResolved(repoId, file.path), {
+                  success: `${file.path} resuelto`,
+                })
+              }
             />
           </div>
         </div>
