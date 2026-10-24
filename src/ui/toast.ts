@@ -55,7 +55,9 @@ export const useToasts = create<ToastState>()((set) => ({
               ...values,
               duration:
                 values.duration ??
-                (values.kind && values.kind !== t.kind ? defaultDuration({ ...t, ...values }) : t.duration),
+                (values.kind && values.kind !== t.kind
+                  ? defaultDuration({ ...t, ...values })
+                  : t.duration),
             }
           : t,
       ),

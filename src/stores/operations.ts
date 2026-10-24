@@ -32,8 +32,9 @@ export const useOperations = create<OperationsState>()((set) => ({
   },
   finish: (opId) => {
     set((state) => {
-      const running = { ...state.running };
-      delete running[opId];
+      const running = Object.fromEntries(
+        Object.entries(state.running).filter(([id]) => id !== opId),
+      );
       return { running };
     });
   },

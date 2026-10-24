@@ -11,7 +11,14 @@ export interface CheckboxProps {
   className?: string;
 }
 
-export function Checkbox({ checked, onCheckedChange, label, description, disabled, className }: CheckboxProps) {
+export function Checkbox({
+  checked,
+  onCheckedChange,
+  label,
+  description,
+  disabled,
+  className,
+}: CheckboxProps) {
   const id = useId();
   return (
     <div className={cn('flex items-start gap-2', className)}>
@@ -26,7 +33,9 @@ export function Checkbox({ checked, onCheckedChange, label, description, disable
         }}
         className={cn(
           'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-chip border transition-colors duration-(--duration-fast)',
-          checked ? 'border-accent bg-accent text-accent-fg' : 'border-line-strong bg-canvas/60 hover:border-accent',
+          checked
+            ? 'border-accent bg-accent text-accent-fg'
+            : 'border-line-strong bg-canvas/60 hover:border-accent',
           'disabled:opacity-50',
         )}
       >

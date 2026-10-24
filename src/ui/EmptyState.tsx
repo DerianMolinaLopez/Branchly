@@ -21,9 +21,14 @@ export function EmptyState({
   return (
     <div
       role={tone === 'error' ? 'alert' : undefined}
-      className={cn('flex flex-col items-center justify-center gap-3 px-6 py-10 text-center', className)}
+      className={cn(
+        'flex flex-col items-center justify-center gap-3 px-6 py-10 text-center',
+        className,
+      )}
     >
-      <p className={cn('font-mono text-md', tone === 'error' ? 'text-danger' : 'text-fg-secondary')}>
+      <p
+        className={cn('font-mono text-md', tone === 'error' ? 'text-danger' : 'text-fg-secondary')}
+      >
         <span className={tone === 'error' ? 'text-danger' : 'text-accent'}>&gt;</span> {title}
         <span className="ml-0.5 animate-blink text-accent" aria-hidden>
           _

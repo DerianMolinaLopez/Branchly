@@ -15,11 +15,21 @@ export const systemApi = {
   },
 };
 
+/** The main window, or null when running outside Tauri (tests, browser). */
+function currentWindow() {
+  try {
+    return getCurrentWindow();
+  } catch {
+    return null;
+  }
+}
+
 /** Controls of the frameless main window. */
 export const windowApi = {
-  minimize: () => getCurrentWindow().minimize(),
-  toggleMaximize: () => getCurrentWindow().toggleMaximize(),
-  close: () => getCurrentWindow().close(),
-  isMaximized: () => getCurrentWindow().isMaximized(),
-  onResized: (handler: () => void) => getCurrentWindow().onResized(handler),
+  minimize: () => currentWindow()?.minimize(),
+  toggleMaximize: () => currentWindow()?.toggleMaximize(),
+  close: () => currentWindow()?.close(),
+  isMaximized: async () => (await currentWindow()?.isMaximized()) ?? false,
+  onResized: async (handler: () => void): Promise<() => void> =>
+    (await currentWindow()?.onResized(handler)) ?? (() => undefined),
 };

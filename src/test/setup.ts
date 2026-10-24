@@ -12,7 +12,11 @@ class ResizeObserverStub {
   unobserve() {}
   disconnect() {}
 }
-globalThis.ResizeObserver ??= ResizeObserverStub as unknown as typeof ResizeObserver;
-Element.prototype.scrollIntoView ??= function scrollIntoView() {};
-Element.prototype.hasPointerCapture ??= () => false;
-Element.prototype.releasePointerCapture ??= () => {};
+if (!('ResizeObserver' in globalThis)) {
+  Object.assign(globalThis, { ResizeObserver: ResizeObserverStub });
+}
+Object.assign(Element.prototype, {
+  scrollIntoView: () => undefined,
+  hasPointerCapture: () => false,
+  releasePointerCapture: () => undefined,
+});

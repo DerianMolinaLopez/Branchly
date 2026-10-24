@@ -7,7 +7,13 @@ import { menuContent, menuItem, menuItemDanger, menuLabel, menuSeparator } from 
 
 export const ContextMenu = Menu.Root;
 
-export function ContextMenuTrigger({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
+export function ContextMenuTrigger({
+  children,
+  disabled,
+}: {
+  children: ReactNode;
+  disabled?: boolean;
+}) {
   return (
     <Menu.Trigger asChild disabled={disabled}>
       {children}
@@ -34,9 +40,20 @@ export interface MenuItemProps {
   children: ReactNode;
 }
 
-export function ContextMenuItem({ icon, shortcut, danger, disabled, onSelect, children }: MenuItemProps) {
+export function ContextMenuItem({
+  icon,
+  shortcut,
+  danger,
+  disabled,
+  onSelect,
+  children,
+}: MenuItemProps) {
   return (
-    <Menu.Item disabled={disabled} onSelect={onSelect} className={cn(menuItem, danger && menuItemDanger)}>
+    <Menu.Item
+      disabled={disabled}
+      onSelect={onSelect}
+      className={cn(menuItem, danger && menuItemDanger)}
+    >
       {icon}
       <span className="flex-1 truncate">{children}</span>
       {shortcut && <Kbd shortcut={shortcut} />}
@@ -65,7 +82,9 @@ export function ContextMenuSub({
 }) {
   return (
     <Menu.Sub>
-      <Menu.SubTrigger className={cn(menuItem, danger && menuItemDanger, 'data-[state=open]:bg-accent-soft')}>
+      <Menu.SubTrigger
+        className={cn(menuItem, danger && menuItemDanger, 'data-[state=open]:bg-accent-soft')}
+      >
         {icon}
         <span className="flex-1">{label}</span>
         <ChevronRight />

@@ -19,7 +19,10 @@ export const useDrafts = create<DraftsState>()((set) => ({
   drafts: {},
   update: (repoId, values) => {
     set((state) => ({
-      drafts: { ...state.drafts, [repoId]: { ...(state.drafts[repoId] ?? EMPTY_DRAFT), ...values } },
+      drafts: {
+        ...state.drafts,
+        [repoId]: { ...(state.drafts[repoId] ?? EMPTY_DRAFT), ...values },
+      },
     }));
   },
   clear: (repoId) => {

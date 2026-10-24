@@ -64,11 +64,16 @@ function ToastCard({ toast }: { toast: Toast }) {
       )}
     >
       <div className="flex items-start gap-2.5 px-3 py-2.5">
-        <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center">{icons[toast.kind]}</span>
+        <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center">
+          {icons[toast.kind]}
+        </span>
         <div className="min-w-0 flex-1">
           <p className="text-base font-medium text-fg">{toast.title}</p>
           {toast.description && (
-            <p className="mt-0.5 line-clamp-4 font-mono text-xs break-words whitespace-pre-line text-fg-muted" data-selectable>
+            <p
+              className="mt-0.5 line-clamp-4 font-mono text-xs break-words whitespace-pre-line text-fg-muted"
+              data-selectable
+            >
               {toast.description}
             </p>
           )}

@@ -44,13 +44,17 @@ export function Dialog({
           <div className="accent-rule absolute inset-x-0 top-0" aria-hidden />
           <header className="flex items-start justify-between gap-4 px-5 pt-4 pb-3">
             <div className="min-w-0">
-              <DialogPrimitive.Title className="text-lg font-semibold text-fg">{title}</DialogPrimitive.Title>
+              <DialogPrimitive.Title className="text-lg font-semibold text-fg">
+                {title}
+              </DialogPrimitive.Title>
               {description ? (
                 <DialogPrimitive.Description className="mt-1 text-base text-fg-muted">
                   {description}
                 </DialogPrimitive.Description>
               ) : (
-                <DialogPrimitive.Description className="sr-only">{title}</DialogPrimitive.Description>
+                <DialogPrimitive.Description className="sr-only">
+                  {title}
+                </DialogPrimitive.Description>
               )}
             </div>
             <DialogPrimitive.Close

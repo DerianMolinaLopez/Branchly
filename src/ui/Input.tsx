@@ -1,4 +1,9 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type TextareaHTMLAttributes,
+} from 'react';
 import { cn } from '@/lib/cn';
 
 const fieldBase =
@@ -34,24 +39,30 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       <input
         ref={ref}
         spellCheck={false}
-        className={cn(fieldBase, 'h-8 pr-2.5 pl-8 text-base', mono && 'font-mono text-sm', className)}
+        className={cn(
+          fieldBase,
+          'h-8 pr-2.5 pl-8 text-base',
+          mono && 'font-mono text-sm',
+          className,
+        )}
         {...props}
       />
     </div>
   );
 });
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  function Textarea({ className, ...props }, ref) {
-    return (
-      <textarea
-        ref={ref}
-        className={cn(fieldBase, 'min-h-20 resize-none px-2.5 py-2 text-base', className)}
-        {...props}
-      />
-    );
-  },
-);
+export const Textarea = forwardRef<
+  HTMLTextAreaElement,
+  TextareaHTMLAttributes<HTMLTextAreaElement>
+>(function Textarea({ className, ...props }, ref) {
+  return (
+    <textarea
+      ref={ref}
+      className={cn(fieldBase, 'min-h-20 resize-none px-2.5 py-2 text-base', className)}
+      {...props}
+    />
+  );
+});
 
 export function Field({
   label,

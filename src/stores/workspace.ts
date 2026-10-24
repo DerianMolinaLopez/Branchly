@@ -45,7 +45,11 @@ interface WorkspaceState {
   scrollToRow: (id: string, row: number, select?: boolean) => void;
 }
 
-const defaultUi = (): RepoUi => ({ selection: null, center: { kind: 'graph' }, scrollRequest: null });
+const defaultUi = (): RepoUi => ({
+  selection: null,
+  center: { kind: 'graph' },
+  scrollRequest: null,
+});
 
 export const useWorkspace = create<WorkspaceState>()((set, get) => ({
   tabs: [],
@@ -55,7 +59,9 @@ export const useWorkspace = create<WorkspaceState>()((set, get) => ({
     set((state) => {
       const exists = state.tabs.some((t) => t.id === info.id);
       return {
-        tabs: exists ? state.tabs : [...state.tabs, { id: info.id, name: info.name, path: info.path }],
+        tabs: exists
+          ? state.tabs
+          : [...state.tabs, { id: info.id, name: info.name, path: info.path }],
         activeId: info.id,
         ui: state.ui[info.id] ? state.ui : { ...state.ui, [info.id]: defaultUi() },
       };
@@ -65,8 +71,7 @@ export const useWorkspace = create<WorkspaceState>()((set, get) => ({
     set((state) => {
       const index = state.tabs.findIndex((t) => t.id === id);
       const tabs = state.tabs.filter((t) => t.id !== id);
-      const ui = { ...state.ui };
-      delete ui[id];
+      const ui = Object.fromEntries(Object.entries(state.ui).filter(([key]) => key !== id));
       let activeId = state.activeId;
       if (activeId === id) {
         activeId = tabs[Math.min(index, tabs.length - 1)]?.id ?? null;
@@ -92,7 +97,9 @@ export const useWorkspace = create<WorkspaceState>()((set, get) => ({
   },
   scrollToRow: (id, row, select = true) => {
     set((state) => ({
-      ui: patch(state.ui, id, { scrollRequest: { row, select, nonce: Date.now() + Math.random() } }),
+      ui: patch(state.ui, id, {
+        scrollRequest: { row, select, nonce: Date.now() + Math.random() },
+      }),
     }));
   },
 }));

@@ -4,7 +4,7 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import { Spinner } from './Spinner';
 
-export const buttonVariants = cva(
+const buttonVariants = cva(
   'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-control font-medium ' +
     'transition-colors duration-(--duration-fast) disabled:pointer-events-none disabled:opacity-45 ' +
     '[&_svg]:size-4 [&_svg]:shrink-0',
@@ -30,15 +30,24 @@ export const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   icon?: ReactNode;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, variant, size, asChild = false, loading = false, icon, children, disabled, ...props },
+  {
+    className,
+    variant,
+    size,
+    asChild = false,
+    loading = false,
+    icon,
+    children,
+    disabled,
+    ...props
+  },
   ref,
 ) {
   const Component = asChild ? Slot : 'button';

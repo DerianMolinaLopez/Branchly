@@ -5,7 +5,10 @@ import { formatShortcut } from '@/lib/shortcuts';
 export function Kbd({ shortcut, className }: { shortcut: string; className?: string }) {
   const keys = formatShortcut(shortcut);
   return (
-    <kbd className={cn('inline-flex items-center gap-0.5 font-sans', className)} aria-label={keys.join('+')}>
+    <kbd
+      className={cn('inline-flex items-center gap-0.5 font-sans', className)}
+      aria-label={keys.join('+')}
+    >
       {keys.map((key, i) => (
         <span
           key={`${key}-${i}`}

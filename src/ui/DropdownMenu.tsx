@@ -28,9 +28,20 @@ export function DropdownMenuContent({
   );
 }
 
-export function DropdownMenuItem({ icon, shortcut, danger, disabled, onSelect, children }: MenuItemProps) {
+export function DropdownMenuItem({
+  icon,
+  shortcut,
+  danger,
+  disabled,
+  onSelect,
+  children,
+}: MenuItemProps) {
   return (
-    <Menu.Item disabled={disabled} onSelect={onSelect} className={cn(menuItem, danger && menuItemDanger)}>
+    <Menu.Item
+      disabled={disabled}
+      onSelect={onSelect}
+      className={cn(menuItem, danger && menuItemDanger)}
+    >
       {icon}
       <span className="flex-1 truncate">{children}</span>
       {shortcut && <Kbd shortcut={shortcut} />}

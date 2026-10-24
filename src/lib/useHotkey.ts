@@ -1,13 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import { isEditableTarget, matchesShortcut } from './shortcuts';
 
 /**
  * Calls `handler` when `shortcut` is pressed anywhere in the window while
  * `enabled`. Shortcuts without Ctrl/⌘/Alt are ignored inside text fields.
  */
-export function useHotkey(shortcut: string, handler: (event: KeyboardEvent) => void, enabled = true): void {
-  const ref = useRef(handler);
-  ref.current = handler;
+export function useHotkey(
+  shortcut: string,
+  handler: (event: KeyboardEvent) => void,
+  enabled = true,
+): void {
+  const onShortcut = useEffectEvent(handler);
   useEffect(() => {
     if (!enabled) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -15,7 +18,7 @@ export function useHotkey(shortcut: string, handler: (event: KeyboardEvent) => v
       const hasModifier = event.ctrlKey || event.metaKey || event.altKey;
       if (!hasModifier && isEditableTarget(event.target)) return;
       event.preventDefault();
-      ref.current(event);
+      onShortcut(event);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => {

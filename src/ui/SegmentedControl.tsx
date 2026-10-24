@@ -20,7 +20,11 @@ export function SegmentedControl<T extends string>({
   label: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex rounded-control border border-line bg-canvas/50 p-0.5">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="inline-flex rounded-control border border-line bg-canvas/50 p-0.5"
+    >
       {segments.map((segment) => (
         <button
           key={segment.value}

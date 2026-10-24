@@ -31,8 +31,16 @@ describe('shortcuts', () => {
   });
 
   it('matches named keys', () => {
-    expect(matchesShortcut(key({ key: 'Enter', code: 'Enter', ctrlKey: true }), 'mod+enter', false)).toBe(true);
-    expect(matchesShortcut(key({ key: 'ArrowDown', code: 'ArrowDown', altKey: true }), 'alt+arrowdown', false)).toBe(true);
+    expect(
+      matchesShortcut(key({ key: 'Enter', code: 'Enter', ctrlKey: true }), 'mod+enter', false),
+    ).toBe(true);
+    expect(
+      matchesShortcut(
+        key({ key: 'ArrowDown', code: 'ArrowDown', altKey: true }),
+        'alt+arrowdown',
+        false,
+      ),
+    ).toBe(true);
     expect(matchesShortcut(key({ key: 'Escape', code: 'Escape' }), 'escape', false)).toBe(true);
   });
 

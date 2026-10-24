@@ -11,7 +11,9 @@ export function SkeletonRows({ count = 6, className }: { count?: number; classNa
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className="flex items-center gap-2.5">
           <Skeleton className="size-4 rounded-full" />
-          <Skeleton className={cn('h-3', i % 3 === 0 ? 'w-2/3' : i % 3 === 1 ? 'w-1/2' : 'w-3/4')} />
+          <Skeleton
+            className={cn('h-3', i % 3 === 0 ? 'w-2/3' : i % 3 === 1 ? 'w-1/2' : 'w-3/4')}
+          />
         </div>
       ))}
     </div>
