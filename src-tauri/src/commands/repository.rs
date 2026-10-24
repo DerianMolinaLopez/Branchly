@@ -75,9 +75,7 @@ pub fn close_repository(state: State<'_, AppState>, repo_id: String) {
 #[tauri::command]
 #[specta::specta]
 pub async fn get_repo_info(state: State<'_, AppState>, repo_id: String) -> CmdResult<RepoInfo> {
-    state
-        .run(&repo_id, |ctx| ctx.session.info(ctx.repo))
-        .await
+    state.run(&repo_id, |ctx| ctx.session.info(ctx.repo)).await
 }
 
 #[tauri::command]
@@ -97,4 +95,11 @@ pub async fn remove_recent_repo(state: State<'_, AppState>, path: String) -> Cmd
 #[specta::specta]
 pub fn cancel_operation(state: State<'_, AppState>, op_id: String) -> bool {
     state.cancel_operation(&op_id)
+}
+
+/// The repository passed on the command line, if any (only the first call).
+#[tauri::command]
+#[specta::specta]
+pub fn take_launch_path(state: State<'_, AppState>) -> Option<String> {
+    state.take_launch_path()
 }

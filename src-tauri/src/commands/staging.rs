@@ -24,7 +24,9 @@ pub async fn get_working_diff(
     staged: bool,
 ) -> CmdResult<FileDiff> {
     state
-        .run(&repo_id, move |ctx| StagingService::new(ctx).diff(&path, staged))
+        .run(&repo_id, move |ctx| {
+            StagingService::new(ctx).diff(&path, staged)
+        })
         .await
 }
 
@@ -48,7 +50,9 @@ pub async fn unstage_files(
     paths: Vec<String>,
 ) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| StagingService::new(ctx).unstage(&paths))
+        .run(&repo_id, move |ctx| {
+            StagingService::new(ctx).unstage(&paths)
+        })
         .await
 }
 
@@ -76,7 +80,9 @@ pub async fn discard_files(
     paths: Vec<String>,
 ) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| StagingService::new(ctx).discard(&paths))
+        .run(&repo_id, move |ctx| {
+            StagingService::new(ctx).discard(&paths)
+        })
         .await
 }
 
@@ -97,7 +103,9 @@ pub async fn stage_hunk(
     hunk: HunkRef,
 ) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| StagingService::new(ctx).stage_hunk(&path, hunk))
+        .run(&repo_id, move |ctx| {
+            StagingService::new(ctx).stage_hunk(&path, hunk)
+        })
         .await
 }
 
@@ -110,7 +118,9 @@ pub async fn unstage_hunk(
     hunk: HunkRef,
 ) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| StagingService::new(ctx).unstage_hunk(&path, hunk))
+        .run(&repo_id, move |ctx| {
+            StagingService::new(ctx).unstage_hunk(&path, hunk)
+        })
         .await
 }
 
@@ -123,7 +133,9 @@ pub async fn discard_hunk(
     hunk: HunkRef,
 ) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| StagingService::new(ctx).discard_hunk(&path, hunk))
+        .run(&repo_id, move |ctx| {
+            StagingService::new(ctx).discard_hunk(&path, hunk)
+        })
         .await
 }
 
@@ -136,15 +148,23 @@ pub async fn resolve_conflict(
     side: ConflictSide,
 ) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| ConflictService::new(ctx).resolve(&path, side))
+        .run(&repo_id, move |ctx| {
+            ConflictService::new(ctx).resolve(&path, side)
+        })
         .await
 }
 
 #[tauri::command]
 #[specta::specta]
-pub async fn mark_resolved(state: State<'_, AppState>, repo_id: String, path: String) -> CmdResult<()> {
+pub async fn mark_resolved(
+    state: State<'_, AppState>,
+    repo_id: String,
+    path: String,
+) -> CmdResult<()> {
     state
-        .run(&repo_id, move |ctx| ConflictService::new(ctx).mark_resolved(&path))
+        .run(&repo_id, move |ctx| {
+            ConflictService::new(ctx).mark_resolved(&path)
+        })
         .await
 }
 
@@ -162,6 +182,8 @@ pub async fn abort_operation(state: State<'_, AppState>, repo_id: String) -> Cmd
 #[specta::specta]
 pub async fn continue_operation(state: State<'_, AppState>, repo_id: String) -> CmdResult<()> {
     state
-        .run(&repo_id, |ctx| ConflictService::new(ctx).continue_operation())
+        .run(&repo_id, |ctx| {
+            ConflictService::new(ctx).continue_operation()
+        })
         .await
 }

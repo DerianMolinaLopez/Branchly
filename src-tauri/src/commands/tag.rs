@@ -7,9 +7,7 @@ use crate::state::{AppState, CmdResult};
 #[tauri::command]
 #[specta::specta]
 pub async fn list_tags(state: State<'_, AppState>, repo_id: String) -> CmdResult<Vec<Tag>> {
-    state
-        .run(&repo_id, |ctx| TagService::new(ctx).list())
-        .await
+    state.run(&repo_id, |ctx| TagService::new(ctx).list()).await
 }
 
 #[tauri::command]

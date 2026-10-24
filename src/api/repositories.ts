@@ -16,4 +16,5 @@ export const repositoriesApi = {
   recent: () => unwrap(commands.listRecentRepos()),
   removeRecent: (path: string) => unwrap(commands.removeRecentRepo(path)),
   cancelOperation: (opId: string) => call(commands.cancelOperation(opId)),
+  takeLaunchPath: () => call(commands.takeLaunchPath()),
 };

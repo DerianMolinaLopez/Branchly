@@ -79,6 +79,12 @@ async removeRecentRepo(path: string) : Promise<Result<null, ErrorPayload>> {
 async cancelOperation(opId: string) : Promise<boolean> {
     return await TAURI_INVOKE("cancel_operation", { opId });
 },
+/**
+ * The repository passed on the command line, if any (only the first call).
+ */
+async takeLaunchPath() : Promise<string | null> {
+    return await TAURI_INVOKE("take_launch_path");
+},
 async getGraphInfo(repoId: string) : Promise<Result<GraphInfo, ErrorPayload>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("get_graph_info", { repoId }) };

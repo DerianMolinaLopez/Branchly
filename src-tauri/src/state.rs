@@ -25,17 +25,24 @@ pub struct AppState {
     repos: RwLock<HashMap<String, OpenRepo>>,
     operations: Mutex<HashMap<String, CancelToken>>,
     next_id: AtomicU64,
+    launch_path: Mutex<Option<String>>,
     pub recent: RecentStore,
 }
 
 impl AppState {
-    pub fn new(recent: RecentStore) -> Self {
+    pub fn new(recent: RecentStore, launch_path: Option<String>) -> Self {
         Self {
+            launch_path: Mutex::new(launch_path),
             repos: RwLock::new(HashMap::new()),
             operations: Mutex::new(HashMap::new()),
             next_id: AtomicU64::new(1),
             recent,
         }
+    }
+
+    /// The repository passed on the command line, returned only once.
+    pub fn take_launch_path(&self) -> Option<String> {
+        lock(&self.launch_path).take()
     }
 
     pub fn session(&self, repo_id: &str) -> Result<Arc<RepoSession>, Error> {
@@ -62,7 +69,10 @@ impl AppState {
             Ok(watcher) => Some(watcher),
             Err(err) => {
                 // The app keeps working without auto-refresh.
-                eprintln!("branchly: could not watch {}: {err}", session.workdir().display());
+                eprintln!(
+                    "branchly: could not watch {}: {err}",
+                    session.workdir().display()
+                );
                 None
             }
         };

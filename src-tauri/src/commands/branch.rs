@@ -48,7 +48,9 @@ pub async fn checkout_remote_branch(
     name: String,
 ) -> CmdResult<Mutation<()>> {
     state
-        .run(&repo_id, move |ctx| BranchService::new(ctx).checkout_remote(&name))
+        .run(&repo_id, move |ctx| {
+            BranchService::new(ctx).checkout_remote(&name)
+        })
         .await
 }
 
@@ -60,7 +62,9 @@ pub async fn checkout_commit(
     sha: String,
 ) -> CmdResult<Mutation<()>> {
     state
-        .run(&repo_id, move |ctx| BranchService::new(ctx).checkout_commit(&sha))
+        .run(&repo_id, move |ctx| {
+            BranchService::new(ctx).checkout_commit(&sha)
+        })
         .await
 }
 
@@ -73,7 +77,9 @@ pub async fn rename_branch(
     to: String,
 ) -> CmdResult<Mutation<()>> {
     state
-        .run(&repo_id, move |ctx| BranchService::new(ctx).rename(&from, &to))
+        .run(&repo_id, move |ctx| {
+            BranchService::new(ctx).rename(&from, &to)
+        })
         .await
 }
 
@@ -86,7 +92,9 @@ pub async fn delete_branch(
     force: bool,
 ) -> CmdResult<Mutation<()>> {
     state
-        .run(&repo_id, move |ctx| BranchService::new(ctx).delete(&name, force))
+        .run(&repo_id, move |ctx| {
+            BranchService::new(ctx).delete(&name, force)
+        })
         .await
 }
 
@@ -100,6 +108,8 @@ pub async fn merge_branch(
     options: MergeOptions,
 ) -> CmdResult<Mutation<MergeOutcome>> {
     state
-        .run(&repo_id, move |ctx| BranchService::new(ctx).merge(&source, options))
+        .run(&repo_id, move |ctx| {
+            BranchService::new(ctx).merge(&source, options)
+        })
         .await
 }

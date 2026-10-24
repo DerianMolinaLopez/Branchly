@@ -38,7 +38,9 @@ pub async fn search_commits(
     field: SearchField,
 ) -> CmdResult<Vec<u32>> {
     state
-        .run(&repo_id, move |ctx| GraphService::new(ctx).search(&query, field))
+        .run(&repo_id, move |ctx| {
+            GraphService::new(ctx).search(&query, field)
+        })
         .await
 }
 

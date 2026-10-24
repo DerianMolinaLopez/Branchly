@@ -42,13 +42,19 @@ pub async fn get_file_history(
     path: String,
 ) -> CmdResult<Vec<FileHistoryEntry>> {
     state
-        .run(&repo_id, move |ctx| CommitService::new(ctx).file_history(&path))
+        .run(&repo_id, move |ctx| {
+            CommitService::new(ctx).file_history(&path)
+        })
         .await
 }
 
 #[tauri::command]
 #[specta::specta]
-pub async fn get_blame(state: State<'_, AppState>, repo_id: String, path: String) -> CmdResult<Blame> {
+pub async fn get_blame(
+    state: State<'_, AppState>,
+    repo_id: String,
+    path: String,
+) -> CmdResult<Blame> {
     state
         .run(&repo_id, move |ctx| CommitService::new(ctx).blame(&path))
         .await
@@ -74,7 +80,9 @@ pub async fn create_commit(
     amend: bool,
 ) -> CmdResult<Mutation<CommitSummary>> {
     state
-        .run(&repo_id, move |ctx| CommitService::new(ctx).commit(&message, amend))
+        .run(&repo_id, move |ctx| {
+            CommitService::new(ctx).commit(&message, amend)
+        })
         .await
 }
 
@@ -87,7 +95,9 @@ pub async fn reset_to(
     mode: ResetMode,
 ) -> CmdResult<Mutation<()>> {
     state
-        .run(&repo_id, move |ctx| CommitService::new(ctx).reset(&sha, mode))
+        .run(&repo_id, move |ctx| {
+            CommitService::new(ctx).reset(&sha, mode)
+        })
         .await
 }
 

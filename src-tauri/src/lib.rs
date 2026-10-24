@@ -30,6 +30,7 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             repository::list_recent_repos,
             repository::remove_recent_repo,
             repository::cancel_operation,
+            repository::take_launch_path,
             // graph
             graph::get_graph_info,
             graph::get_graph_rows,
@@ -108,6 +109,19 @@ pub fn export_bindings(builder: &Builder<tauri::Wry>, path: &str) {
         .expect("failed to export TypeScript bindings");
 }
 
+/// A repository folder given as the first command-line argument
+/// (`branchly ~/code/project`), made absolute.
+fn launch_path() -> Option<String> {
+    let arg = std::env::args_os().nth(1)?;
+    let path = std::path::PathBuf::from(arg);
+    let path = if path.is_absolute() {
+        path
+    } else {
+        std::env::current_dir().ok()?.join(path)
+    };
+    Some(path.to_string_lossy().into_owned())
+}
+
 pub fn run() {
     let builder = specta_builder();
     #[cfg(debug_assertions)]
@@ -120,7 +134,10 @@ pub fn run() {
         .setup(move |app| {
             builder.mount_events(app);
             let data_dir = app.path().app_data_dir()?;
-            app.manage(AppState::new(RecentStore::new(data_dir.join("recent.json"))));
+            app.manage(AppState::new(
+                RecentStore::new(data_dir.join("recent.json")),
+                launch_path(),
+            ));
             Ok(())
         })
         .run(tauri::generate_context!())
