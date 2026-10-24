@@ -31,12 +31,19 @@ use crate::error::Result;
 pub struct CommitRecord {
     pub id: git2::Oid,
     pub parents: Vec<git2::Oid>,
-    pub summary: Box<str>,
+    /// Full message, trimmed; the summary is its first line.
     pub message: Box<str>,
     pub author_name: Box<str>,
     pub author_email: Box<str>,
     pub time: i64,
     pub offset_minutes: i32,
+}
+
+impl CommitRecord {
+    /// First line of the message.
+    pub fn summary(&self) -> &str {
+        self.message.lines().next().unwrap_or_default().trim()
+    }
 }
 
 /// What to do with a single hunk of a working-tree diff.

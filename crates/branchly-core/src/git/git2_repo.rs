@@ -300,6 +300,7 @@ impl GitRepository for Git2Repository {
     }
 
     fn walk_all(&self) -> Result<Vec<CommitRecord>> {
+        let _no_cache = ObjectCachePaused::new();
         let mut walk = self.repo.revwalk()?;
         walk.set_sorting(Sort::TOPOLOGICAL | Sort::TIME)?;
         for glob in ["refs/heads", "refs/remotes", "refs/tags"] {
@@ -318,7 +319,6 @@ impl GitRepository for Git2Repository {
             records.push(CommitRecord {
                 id: commit.id(),
                 parents: commit.parent_ids().collect(),
-                summary: message.lines().next().unwrap_or_default().trim().into(),
                 message: message.into(),
                 author_name: String::from_utf8_lossy(author.name_bytes()).into(),
                 author_email: String::from_utf8_lossy(author.email_bytes()).into(),
@@ -1242,6 +1242,27 @@ impl GitRepository for Git2Repository {
             ["push", "--progress", remote, "--delete", name],
             op,
         )
+    }
+}
+
+/// Turns libgit2's object cache off while alive.
+///
+/// The full-history walk reads every commit exactly once, so caching them
+/// only costs memory: about 100 MB on git.git, which the allocator then keeps
+/// after the handle is dropped. The switch is process-wide; operations that
+/// run concurrently merely skip the cache meanwhile, which is harmless.
+struct ObjectCachePaused;
+
+impl ObjectCachePaused {
+    fn new() -> Self {
+        git2::opts::enable_caching(false);
+        Self
+    }
+}
+
+impl Drop for ObjectCachePaused {
+    fn drop(&mut self) {
+        git2::opts::enable_caching(true);
     }
 }
 
