@@ -4,6 +4,7 @@ import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { commitsApi, keys, type CommitDetail } from '@/api';
 import { copyText } from '@/lib/clipboard';
+import { reflowParagraphs } from '@/lib/text';
 import { formatAbsolute, formatRelative } from '@/lib/time';
 import { focusCommit } from '@/features/repo/navigation';
 import { useRepoUi, useWorkspace } from '@/stores/workspace';
@@ -83,12 +84,16 @@ function CommitHeader({ repoId, commit }: { repoId: string; commit: CommitDetail
         {commit.summary || <span className="text-fg-subtle italic">Sin mensaje</span>}
       </h2>
       {commit.body && (
-        <p
-          className="mt-2 max-h-40 overflow-y-auto text-base break-words whitespace-pre-wrap text-fg-secondary"
+        <div
+          className="mt-2 max-h-48 space-y-2 overflow-y-auto text-base break-words text-fg-secondary"
           data-selectable
         >
-          {commit.body}
-        </p>
+          {reflowParagraphs(commit.body).map((paragraph, i) => (
+            <p key={i} className="whitespace-pre-wrap">
+              {paragraph}
+            </p>
+          ))}
+        </div>
       )}
 
       <div className="mt-3 flex items-center gap-2.5">

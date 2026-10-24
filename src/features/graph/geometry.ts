@@ -39,6 +39,30 @@ export function edgeSegment(edge: GraphEdge, offset: number): Segment {
   };
 }
 
+export interface ColumnLayout {
+  refs: number;
+  author: number;
+  date: number;
+  sha: number;
+  /** Narrow view: authors are shown as avatars only. */
+  compact: boolean;
+}
+
+/**
+ * Widths of the fixed graph columns for a list `width` pixels wide, so the
+ * message column keeps a useful width when the window or panes are narrow.
+ */
+export function columnLayout(width: number): ColumnLayout {
+  const compact = width < 900;
+  return {
+    refs: width < 760 ? 128 : width < 1100 ? 160 : 190,
+    author: compact ? 36 : 150,
+    date: width < 680 ? 0 : 84,
+    sha: width < 600 ? 0 : 68,
+    compact,
+  };
+}
+
 /** Control points of the S-curve used when an edge changes lane. */
 export function curveControls(s: Segment): [number, number, number, number] {
   const bend = (s.y2 - s.y1) * 0.6;

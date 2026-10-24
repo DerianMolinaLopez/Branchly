@@ -2,7 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import type { GraphRow } from '@/api';
 import { GRAPH_PADDING, LANE_WIDTH, MAX_VISIBLE_LANES, ROW_HEIGHT } from './constants';
 import { drawGraph, type GraphPalette } from './draw';
-import { curveControls, edgeSegment, graphColumnWidth, laneX, rowCenterY } from './geometry';
+import {
+  columnLayout,
+  curveControls,
+  edgeSegment,
+  graphColumnWidth,
+  laneX,
+  rowCenterY,
+} from './geometry';
 
 describe('graph geometry', () => {
   it('places lanes and rows on a regular grid', () => {
@@ -30,6 +37,17 @@ describe('graph geometry', () => {
     expect(c2x).toBe(s.x2);
     expect(c1y).toBeGreaterThan(s.y1);
     expect(c2y).toBeLessThan(s.y2);
+  });
+
+  it('shrinks the fixed columns on narrow lists', () => {
+    const wide = columnLayout(1400);
+    const narrow = columnLayout(700);
+    expect(wide.compact).toBe(false);
+    expect(narrow.compact).toBe(true);
+    expect(narrow.refs + narrow.author + narrow.date + narrow.sha).toBeLessThan(
+      wide.refs + wide.author + wide.date + wide.sha,
+    );
+    expect(columnLayout(500).sha).toBe(0);
   });
 
   it('caps the graph column width', () => {

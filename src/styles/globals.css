@@ -20,7 +20,7 @@
     /* Navy to teal, brightest in the top-left corner. */
     background-image:
       radial-gradient(120% 80% at 0% 0%, rgb(15 58 69 / 0.75) 0%, transparent 55%),
-      linear-gradient(165deg, var(--color-base) 0%, var(--color-canvas) 60%);
+      linear-gradient(165deg, var(--color-mid) 0%, var(--color-canvas) 60%);
     font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     user-select: none;

@@ -1,15 +1,17 @@
 /*
  * Branchly design tokens. Every color, font, radius and duration used by the
  * UI is declared here; components only reference these tokens (as Tailwind
- * utilities such as `bg-surface` or as `var(--color-…)`). The default Tailwind
+ * utilities such as `bg-surface` or as `var(--color-…)`). `static` emits every
+ * token even when no utility uses it: the canvas and inline styles read them
+ * at runtime. The default Tailwind
  * palette is cleared so stray colors cannot creep in. See DESIGN.md.
  */
-@theme {
+@theme static {
   --color-*: initial;
 
   /* Backgrounds, from deepest to most elevated */
   --color-canvas: #071821;
-  --color-base: #0b2530;
+  --color-mid: #0b2530;
   --color-teal: #0f3a45;
   --color-surface: #0c2a36;
   --color-raised: #10323f;

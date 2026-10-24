@@ -96,7 +96,7 @@ function CenterPane({ repoId, active }: { repoId: string; active: boolean }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, transition: { duration: 0.12 } }}
             transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-            className="absolute inset-0 bg-base"
+            className="absolute inset-0 bg-mid"
           >
             {center.kind === 'diff' && (
               <DiffView repoId={repoId} source={center.source} onClose={back} />

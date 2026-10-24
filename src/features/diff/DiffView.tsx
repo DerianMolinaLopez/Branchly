@@ -272,7 +272,7 @@ function DiffBody({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
-      <div className="absolute top-2 right-4 z-10 flex items-center gap-0.5 rounded-control border border-line bg-raised/95 p-0.5 shadow-overlay">
+      <div className="absolute right-5 bottom-4 z-10 flex items-center gap-0.5 rounded-control border border-line bg-raised/95 p-0.5 shadow-overlay">
         <span className="px-1.5 font-mono text-xs text-fg-muted tabular-nums">
           {blocks.length === 0
             ? 'sin cambios'

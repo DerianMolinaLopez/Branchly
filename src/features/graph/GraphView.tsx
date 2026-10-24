@@ -22,9 +22,9 @@ import {
   Skeleton,
 } from '@/ui';
 import { CommitMenuItems } from './CommitMenu';
-import { REFS_COLUMN_WIDTH, ROW_HEIGHT } from './constants';
+import { ROW_HEIGHT } from './constants';
 import { drawGraph, readPalette, type GraphPalette } from './draw';
-import { graphColumnWidth } from './geometry';
+import { columnLayout, graphColumnWidth } from './geometry';
 import { GraphSearch } from './GraphSearch';
 import { RefChips } from './RefChips';
 import { useGraphInfo, useGraphRows } from './useGraph';
@@ -50,6 +50,8 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
   const graphWidth = graphColumnWidth(info.data?.maxColumns ?? 1);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [listWidth, setListWidth] = useState(1000);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const paletteRef = useRef<GraphPalette | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -115,6 +117,18 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
     });
   });
 
+  useLayoutEffect(() => {
+    const element = rootRef.current;
+    if (!element) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setListWidth(entry.contentRect.width);
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   // Requests from search, the sidebar or the detail panel.
   useEffect(() => {
     if (!scrollRequest) return;
@@ -167,11 +181,12 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
     setMatches({ rows, current: currentMatch });
   }, []);
 
-  const columns = `${REFS_COLUMN_WIDTH}px ${graphWidth}px minmax(0, 1fr) 150px 96px 72px`;
+  const layout = columnLayout(listWidth);
+  const columns = `${layout.refs}px ${graphWidth}px minmax(0, 1fr) ${layout.author}px ${layout.date}px ${layout.sha}px`;
   const empty = info.data?.total === 0 && !wip;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div ref={rootRef} className="flex h-full min-h-0 flex-col">
       <div className="flex h-10 shrink-0 items-center gap-3 border-b border-line px-3">
         <h2 className="font-mono text-sm text-fg-secondary">
           <span className="text-accent">&gt;</span> historial
@@ -193,7 +208,7 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
         <span className="pl-3">Ramas y etiquetas</span>
         <span className="pl-2.5">Gráfica</span>
         <span className="pl-2">Mensaje</span>
-        <span>Autor</span>
+        <span>{layout.compact ? '' : 'Autor'}</span>
         <span>Fecha</span>
         <span>Commit</span>
       </div>
@@ -250,6 +265,7 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
                     currentMatch={matches.current === graphIndex}
                     isHead={row?.commit.id === headId}
                     current={current?.name ?? null}
+                    compact={layout.compact}
                     onSelect={selectIndex}
                   />
                 );
@@ -258,7 +274,7 @@ export function GraphView({ repoId, searchToken }: { repoId: string; searchToken
                 ref={canvasRef}
                 aria-hidden
                 className="pointer-events-none absolute z-[1]"
-                style={{ top: firstVirtual * ROW_HEIGHT, left: REFS_COLUMN_WIDTH }}
+                style={{ top: firstVirtual * ROW_HEIGHT, left: layout.refs }}
               />
             </div>
           )}
@@ -288,6 +304,7 @@ interface CommitRowProps {
   currentMatch: boolean;
   isHead: boolean;
   current: string | null;
+  compact: boolean;
   onSelect: (index: number) => boolean;
 }
 
@@ -303,6 +320,7 @@ const CommitRow = memo(function CommitRow({
   currentMatch,
   isHead,
   current,
+  compact,
   onSelect,
 }: CommitRowProps) {
   const style = {
@@ -364,15 +382,17 @@ const CommitRow = memo(function CommitRow({
           </span>
           <span className="relative z-[2] flex min-w-0 items-center gap-2 pr-2">
             <Avatar name={commit.author.name} email={commit.author.email} size="sm" />
-            <span className="truncate text-sm text-fg-muted">{commit.author.name}</span>
+            {!compact && (
+              <span className="truncate text-sm text-fg-muted">{commit.author.name}</span>
+            )}
           </span>
           <span
-            className="relative z-[2] truncate text-sm text-fg-muted"
+            className="relative z-[2] overflow-hidden text-sm whitespace-nowrap text-fg-muted"
             title={formatAbsolute(commit.author.timestamp)}
           >
             {formatRelative(commit.author.timestamp)}
           </span>
-          <span className="relative z-[2] font-mono text-xs text-fg-subtle group-hover:text-fg-muted">
+          <span className="relative z-[2] overflow-hidden font-mono text-xs text-fg-subtle group-hover:text-fg-muted">
             {commit.shortId}
           </span>
         </div>
@@ -420,7 +440,7 @@ function WipRow({
     >
       <span />
       <span />
-      <span className="relative z-[2] flex items-center gap-3 pl-2 font-mono text-sm">
+      <span className="relative z-[2] col-span-4 flex min-w-0 items-center gap-3 overflow-hidden pl-2 font-mono text-sm whitespace-nowrap">
         <span className="text-accent">
           cambios sin confirmar<span className="animate-blink">_</span>
         </span>

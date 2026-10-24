@@ -12,7 +12,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-accent text-accent-fg hover:bg-accent-hover active:bg-accent-active shadow-[0_0_0_1px_var(--color-accent),0_0_16px_var(--color-accent-soft)]',
+          'bg-accent text-accent-fg hover:bg-accent-hover active:bg-accent-active shadow-[0_0_0_1px_var(--color-accent),0_0_16px_var(--color-accent-soft)] disabled:bg-teal disabled:text-fg-muted disabled:shadow-none disabled:opacity-100',
         secondary:
           'bg-raised text-fg-secondary border border-line hover:bg-raised-hover hover:text-fg hover:border-line-strong',
         ghost: 'text-fg-secondary hover:bg-raised hover:text-fg',

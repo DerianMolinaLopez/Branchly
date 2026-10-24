@@ -91,7 +91,7 @@ export function BlameView({
                   style={{ transform: `translateY(${item.start}px)` }}
                 >
                   <span
-                    className="sticky left-0 flex w-72 shrink-0 items-center gap-2 border-r border-line bg-base pr-2 pl-2"
+                    className="sticky left-0 flex w-72 shrink-0 items-center gap-2 border-r border-line bg-mid pr-2 pl-2"
                     style={{ boxShadow: color ? `inset 2px 0 0 ${color}` : undefined }}
                   >
                     {info?.first && (

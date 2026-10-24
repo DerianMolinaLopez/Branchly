@@ -91,7 +91,7 @@ export function Toolbar({ repoId }: { repoId: string }) {
   const lastStash = stashes.data?.[0];
 
   return (
-    <div className="flex h-(--toolbar-height) shrink-0 items-center gap-1 border-b border-line bg-base/60 px-2">
+    <div className="flex h-(--toolbar-height) shrink-0 items-center gap-1 border-b border-line bg-mid/60 px-2">
       <BranchSwitcher
         repoId={repoId}
         name={info.data?.head.branch ?? null}

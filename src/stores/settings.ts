@@ -25,8 +25,8 @@ export const useSettings = create<SettingsState>()(
     (set) => ({
       autoFetchMinutes: 0,
       diffMode: 'unified',
-      sidebarWidth: 248,
-      panelWidth: 380,
+      sidebarWidth: 232,
+      panelWidth: 360,
       openPaths: [],
       activePath: null,
       setAutoFetch: (autoFetchMinutes) => {

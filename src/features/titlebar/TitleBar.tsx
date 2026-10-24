@@ -56,9 +56,7 @@ export function TitleBar() {
               }}
               className={cn(
                 'group relative flex max-w-56 min-w-28 items-center gap-2 border-r border-line pr-1.5 pl-3 text-base transition-colors duration-(--duration-fast)',
-                active
-                  ? 'bg-base text-fg'
-                  : 'text-fg-muted hover:bg-base/50 hover:text-fg-secondary',
+                active ? 'bg-mid text-fg' : 'text-fg-muted hover:bg-mid/50 hover:text-fg-secondary',
               )}
             >
               <span
