@@ -1,0 +1,184 @@
+# Branchly
+
+Cliente Git de escritorio ligero y moderno, inspirado en GitKraken. Construido
+con Tauri 2 (Rust + WebView del sistema) y React.
+
+![Gráfica de commits de ripgrep en Branchly](docs/screenshots/grafica.webp)
+
+## Funcionalidades
+
+- **Repositorios**: abrir una carpeta, clonar desde una URL con progreso y
+  cancelación, crear un repositorio vacío, lista de recientes, pestañas, y
+  `branchly <carpeta>` desde la terminal.
+- **Gráfica de commits**: carriles de colores por rama, líneas de merge,
+  etiquetas de ramas locales, remotas y tags, avatar, mensaje, fecha relativa y
+  hash corto. Es fluida con más de 85 000 commits: los carriles se calculan en
+  Rust, se dibujan en Canvas y la lista está virtualizada.
+- **Historial**: detalle de commit con archivos y diffs, historial de un
+  archivo, blame por línea y búsqueda por mensaje, autor o hash.
+- **Diffs**: vista unificada y lado a lado, resaltado de sintaxis, números de
+  línea y navegación entre cambios.
+- **Staging**: preparar y quitar archivos **o bloques (hunks)**, descartar con
+  confirmación, editor de commit con resumen y descripción, y amend.
+- **Ramas**: crear, cambiar, renombrar, eliminar y fusionar, también
+  **arrastrando una rama sobre otra**. Indicadores de commits por delante y por
+  detrás del remoto.
+- **Remotos**: fetch, pull y push con progreso y notificaciones, y fetch
+  automático opcional.
+- **Stash** (guardar con mensaje, aplicar, pop, eliminar) y **etiquetas**
+  (crear, publicar, eliminar).
+- **Conflictos**: detección, lista de archivos, resolver con la versión actual
+  o la entrante, abrir en el editor externo, y abortar o continuar.
+- **Refresco automático** cuando cambian archivos desde fuera (terminal,
+  editor), con debounce.
+- **Deshacer** la última operación local cuando es seguro, desde el toast,
+  la barra de herramientas o con Ctrl/⌘+Z.
+- **Paleta de comandos** (Ctrl/⌘+K), atajos de teclado, menús contextuales y
+  navegación completa con teclado.
+
+| | |
+|---|---|
+| ![Pantalla de inicio](docs/screenshots/inicio.webp) | ![Paleta de comandos](docs/screenshots/paleta.webp) |
+| ![Staging por bloques](docs/screenshots/staging.webp) | ![Diff lado a lado](docs/screenshots/diff-lado-a-lado.webp) |
+
+## Requisitos
+
+| Herramienta | Versión |
+|---|---|
+| [Git](https://git-scm.com) | 2.30 o superior, en el `PATH` (también en ejecución) |
+| [Rust](https://rustup.rs) | 1.88 o superior (`rustup` instala la versión de `rust-toolchain.toml`) |
+| [Node.js](https://nodejs.org) | 20 o superior, con npm |
+
+Además, las dependencias de sistema de Tauri:
+
+```bash
+# Fedora
+sudo dnf install webkit2gtk4.1-devel gtk3-devel libsoup3-devel \
+  javascriptcoregtk4.1-devel librsvg2-devel gcc
+
+# Debian / Ubuntu
+sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev \
+  libjavascriptcoregtk-4.1-dev librsvg2-dev build-essential
+
+# Arch
+sudo pacman -S webkit2gtk-4.1 gtk3 libsoup3 librsvg base-devel
+```
+
+- **macOS**: Xcode Command Line Tools (`xcode-select --install`).
+- **Windows**: Microsoft C++ Build Tools y WebView2 (incluido en Windows 10/11).
+
+Más detalles en los [requisitos de Tauri](https://v2.tauri.app/start/prerequisites/).
+No hace falta OpenSSL ni libssh2: las operaciones de red usan tu `git`
+([ADR 0002](docs/adr/0002-git2-y-git-cli.md)).
+
+## Desarrollo
+
+```bash
+npm install
+npm run app:dev                               # app con recarga en caliente
+npx tauri dev -- -- /ruta/absoluta/a/un-repo  # y abre ese repositorio al arrancar
+```
+
+`npm run app:dev` arranca Vite en el puerto 1420 y compila el backend en modo
+debug. En debug, la app regenera `src/api/bindings.ts` (los tipos y comandos
+de TypeScript generados desde Rust) al arrancar. También puedes regenerarlos
+sin abrir la app:
+
+```bash
+npm run bindings
+```
+
+### Comprobaciones
+
+```bash
+npm run check                       # typecheck, ESLint, Prettier y Vitest
+cargo test -p branchly-core         # núcleo: no necesita WebKitGTK
+cargo test --workspace              # todo (necesita las dependencias de Tauri)
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all --check
+```
+
+Las pruebas del núcleo crean repositorios temporales y usan repositorios bare
+locales como remotos, así que no necesitan red. La configuración local de
+cada repositorio de prueba las aísla de tu configuración global de Git
+(identidad, firma, hooks).
+
+## Instaladores
+
+```bash
+npm run app:build
+```
+
+Genera el binario optimizado (LTO, `codegen-units = 1`, `strip`, `opt-level`
+`s` para la app y `3` para el núcleo y libgit2) y los instaladores de la
+plataforma actual en `target/release/bundle/`:
+
+| Plataforma | Formatos |
+|---|---|
+| Linux | `.deb`, `.rpm`, `.AppImage` |
+| macOS | `.app`, `.dmg` |
+| Windows | `.msi`, `.exe` (NSIS) |
+
+Para generar solo algunos formatos: `npm run app:build -- --bundles deb,rpm`.
+Los iconos se regeneran desde `src-tauri/icons/logo.svg` con
+`npx tauri icon src-tauri/icons/logo.svg -o src-tauri/icons`.
+
+## Rendimiento
+
+Medido en Linux (Fedora 44, build de release):
+
+| Métrica | Resultado |
+|---|---|
+| Instalador `.deb` / `.rpm` | 4,1 MB |
+| Arranque hasta mostrar un repositorio abierto | ≈ 0,4 s |
+| Memoria con un repositorio de 2 340 commits abierto | ≈ 250 MB, de los que unos 170 MB son la base de WebKitGTK |
+| Gráfica de `git/git` (85 799 commits): cálculo completo | 0,90 s, una sola vez por cambio de referencias |
+| Página de 200 filas / búsqueda en todos los mensajes | 0,4 ms / 7 ms |
+| JavaScript inicial | 409 KB (130 KB gzip); diff, blame y paleta se cargan bajo demanda |
+
+## Atajos de teclado
+
+`Mod` es ⌘ en macOS y Ctrl en Linux y Windows. Todos los atajos aparecen
+también en los tooltips, los menús y la paleta de comandos.
+
+| Acción | Atajo |
+|---|---|
+| Paleta de comandos | `Mod+K` |
+| Abrir / clonar repositorio | `Mod+O` / `Mod+Shift+O` |
+| Fetch / pull / push | `Mod+Shift+F` / `Mod+Shift+L` / `Mod+Shift+P` |
+| Nueva rama | `Mod+B` |
+| Guardar en el stash / aplicar el último | `Mod+Shift+S` / `Mod+Shift+A` |
+| Ir a los cambios / preparar todo | `Mod+Shift+M` / `Mod+Shift+Enter` |
+| Hacer commit | `Mod+Enter` |
+| Deshacer la última operación | `Mod+Z` |
+| Buscar commits | `Mod+F` |
+| Cambio siguiente / anterior en un diff | `Alt+↓` / `Alt+↑` |
+| Diff unificado / lado a lado | `Mod+Shift+D` |
+| Cerrar pestaña / siguiente pestaña | `Mod+W` / `Ctrl+Tab` |
+| Navegar commits | `↑` `↓` (o `j` `k`), `Inicio`, `Fin`, `Re Pág`, `Av Pág` |
+
+## Estructura
+
+```
+crates/branchly-core/   Núcleo en Rust sin Tauri: domain, git, services, gráfica
+src-tauri/              App Tauri: comandos, estado, eventos y watcher
+src/                    Frontend React: api, features, ui, stores, styles
+docs/adr/               Decisiones de arquitectura
+```
+
+- [ARCHITECTURE.md](ARCHITECTURE.md): capas, flujo de una acción y ADR.
+- [DESIGN.md](DESIGN.md): tokens, paleta, tipografía y componentes.
+
+## Solución de problemas
+
+- **El push o el fetch fallan pidiendo credenciales**: Branchly no muestra
+  prompts. Configura un credential helper (`git config --global
+  credential.helper libsecret`, `manager` o `osxkeychain`) o usa SSH con
+  `ssh-agent`. Lo que funcione con `git push` en tu terminal funciona en
+  Branchly.
+- **"Tu identidad de Git no está configurada"**: ejecuta
+  `git config --global user.name "Tu nombre"` y
+  `git config --global user.email tu@correo`.
+- **Los cambios hechos fuera no se refrescan en repositorios enormes**: puede
+  agotarse el límite de inotify. Súbelo con
+  `sudo sysctl fs.inotify.max_user_watches=524288`.
