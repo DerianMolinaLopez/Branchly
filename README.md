@@ -41,6 +41,13 @@ con Tauri 2 (Rust + WebView del sistema) y React.
 | ![Pantalla de inicio](docs/screenshots/inicio.webp) | ![Paleta de comandos](docs/screenshots/paleta.webp) |
 | ![Staging por bloques](docs/screenshots/staging.webp) | ![Diff lado a lado](docs/screenshots/diff-lado-a-lado.webp) |
 
+## Instalar y usar
+
+¿Solo quieres usar Branchly? Sigue [docs/EJECUCION.md](docs/EJECUCION.md):
+AppImage para cualquier distribución, `.deb` o `.rpm`, y cómo fijarlo en la
+barra de tareas. Para generar esos ejecutables, consulta
+[docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
+
 ## Requisitos
 
 | Herramienta | Versión |
@@ -120,6 +127,9 @@ plataforma actual en `target/release/bundle/`:
 | Windows | `.msi`, `.exe` (NSIS) |
 
 Para generar solo algunos formatos: `npm run app:build -- --bundles deb,rpm`.
+Estos paquetes solo funcionan en tu distribución y versiones más nuevas. Para
+ejecutables que funcionen en cualquier distribución (AppImage compilado en
+Ubuntu 22.04), sigue [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
 Los iconos se regeneran desde `src-tauri/icons/logo.svg` con
 `npx tauri icon src-tauri/icons/logo.svg -o src-tauri/icons`.
 
@@ -171,6 +181,8 @@ docs/adr/               Decisiones de arquitectura
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): capas, flujo de una acción y ADR.
 - [DESIGN.md](DESIGN.md): tokens, paleta, tipografía y componentes.
+- [docs/EJECUCION.md](docs/EJECUCION.md): instalación y uso en Linux.
+- [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md): plan para generar ejecutables portables.
 
 ## Solución de problemas
 
