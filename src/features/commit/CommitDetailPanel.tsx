@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { commitsApi, keys, type CommitDetail } from '@/api';
@@ -39,7 +39,7 @@ export function CommitDetailPanel({ repoId, sha }: { repoId: string; sha: string
     );
   }
   return (
-    <motion.div
+    <m.div
       key={sha}
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ export function CommitDetailPanel({ repoId, sha }: { repoId: string; sha: string
     >
       <CommitHeader repoId={repoId} commit={detail.data} />
       <CommitFiles repoId={repoId} commit={detail.data} />
-    </motion.div>
+    </m.div>
   );
 }
 

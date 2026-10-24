@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FolderGit2, FolderOpen, FolderPlus, GitFork, TriangleAlert, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { keys, repositoriesApi, systemApi, type RecentRepo } from '@/api';
@@ -126,7 +126,7 @@ function TypedWord({ word }: { word: string }) {
   return (
     <span aria-label={word}>
       {Array.from(word).map((char, i) => (
-        <motion.span
+        <m.span
           key={i}
           aria-hidden
           initial={{ opacity: 0 }}
@@ -134,7 +134,7 @@ function TypedWord({ word }: { word: string }) {
           transition={{ delay: 0.12 + i * 0.055, duration: 0.01 }}
         >
           {char}
-        </motion.span>
+        </m.span>
       ))}
     </span>
   );

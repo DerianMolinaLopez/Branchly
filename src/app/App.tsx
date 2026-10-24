@@ -1,8 +1,8 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { MotionConfig } from 'framer-motion';
+import { domAnimation, LazyMotion, MotionConfig } from 'framer-motion';
+import { lazy, Suspense } from 'react';
 import { DialogHost } from '@/features/dialogs/DialogHost';
 import { HomeScreen } from '@/features/home/HomeScreen';
-import { CommandPalette } from '@/features/palette/CommandPalette';
 import { GlobalShortcuts } from '@/features/palette/GlobalShortcuts';
 import { RepoView } from '@/features/repo/RepoView';
 import { useRepoChanges } from '@/features/repo/useRepoChanges';
@@ -12,14 +12,22 @@ import { Toaster, TooltipProvider } from '@/ui';
 import { queryClient } from './queryClient';
 import { useSessionRestore } from './useSessionRestore';
 
+// Not needed for the first paint: loaded on demand.
+const CommandPalette = lazy(() =>
+  import('@/features/palette/CommandPalette').then((m) => ({ default: m.CommandPalette })),
+);
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion="user">
-        <TooltipProvider delayDuration={450} skipDelayDuration={150}>
-          <Shell />
-        </TooltipProvider>
-      </MotionConfig>
+      {/* Only the DOM animation features we use (opacity, transforms, exit). */}
+      <LazyMotion features={domAnimation} strict>
+        <MotionConfig reducedMotion="user">
+          <TooltipProvider delayDuration={450} skipDelayDuration={150}>
+            <Shell />
+          </TooltipProvider>
+        </MotionConfig>
+      </LazyMotion>
     </QueryClientProvider>
   );
 }
@@ -41,7 +49,9 @@ function Shell() {
         ))}
       </div>
       <DialogHost />
-      <CommandPalette />
+      <Suspense fallback={null}>
+        <CommandPalette />
+      </Suspense>
       <GlobalShortcuts />
       <Toaster />
     </div>

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { CheckCircle2, CircleAlert, Info, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
@@ -45,7 +45,7 @@ function ToastCard({ toast }: { toast: Toast }) {
   }, [dismiss, paused, toast.duration, toast.id]);
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, y: 12, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -113,6 +113,6 @@ function ToastCard({ toast }: { toast: Toast }) {
           )}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

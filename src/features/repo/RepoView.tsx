@@ -1,20 +1,28 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { BlameView } from '@/features/history/BlameView';
+import { AnimatePresence, m } from 'framer-motion';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { CommitDetailPanel } from '@/features/commit/CommitDetailPanel';
-import { DiffView } from '@/features/diff/DiffView';
 import { GraphView } from '@/features/graph/GraphView';
-import { FileHistoryView } from '@/features/history/FileHistoryView';
 import { FOCUS_SEARCH_EVENT } from '@/features/palette/commands';
 import { Sidebar } from '@/features/sidebar/Sidebar';
 import { StagingPanel } from '@/features/staging/StagingPanel';
 import { useSettings } from '@/stores/settings';
 import { useRepoUi, useWorkspace, type Selection } from '@/stores/workspace';
-import { ResizeHandle } from '@/ui';
+import { ResizeHandle, SkeletonRows } from '@/ui';
 import { RepoActiveContext } from './context';
 import { useStatus } from './queries';
 import { Toolbar } from './Toolbar';
 import { useAutoFetch } from './useAutoFetch';
+
+// Secondary views are split into their own chunks and loaded when opened.
+const DiffView = lazy(() =>
+  import('@/features/diff/DiffView').then((m) => ({ default: m.DiffView })),
+);
+const FileHistoryView = lazy(() =>
+  import('@/features/history/FileHistoryView').then((m) => ({ default: m.FileHistoryView })),
+);
+const BlameView = lazy(() =>
+  import('@/features/history/BlameView').then((m) => ({ default: m.BlameView })),
+);
 
 /** One open repository: toolbar, sidebar, center view and contextual panel. */
 export function RepoView({ repoId, active }: { repoId: string; active: boolean }) {
@@ -86,7 +94,7 @@ function CenterPane({ repoId, active }: { repoId: string; active: boolean }) {
       </div>
       <AnimatePresence>
         {center.kind !== 'graph' && (
-          <motion.div
+          <m.div
             key={
               center.kind === 'diff'
                 ? `diff:${JSON.stringify(center.source)}`
@@ -98,16 +106,18 @@ function CenterPane({ repoId, active }: { repoId: string; active: boolean }) {
             transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
             className="absolute inset-0 bg-mid"
           >
-            {center.kind === 'diff' && (
-              <DiffView repoId={repoId} source={center.source} onClose={back} />
-            )}
-            {center.kind === 'history' && (
-              <FileHistoryView repoId={repoId} path={center.path} onClose={back} />
-            )}
-            {center.kind === 'blame' && (
-              <BlameView repoId={repoId} path={center.path} onClose={back} />
-            )}
-          </motion.div>
+            <Suspense fallback={<SkeletonRows count={10} className="p-4" />}>
+              {center.kind === 'diff' && (
+                <DiffView repoId={repoId} source={center.source} onClose={back} />
+              )}
+              {center.kind === 'history' && (
+                <FileHistoryView repoId={repoId} path={center.path} onClose={back} />
+              )}
+              {center.kind === 'blame' && (
+                <BlameView repoId={repoId} path={center.path} onClose={back} />
+              )}
+            </Suspense>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
