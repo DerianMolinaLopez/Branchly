@@ -5,3 +5,4 @@ target
 .DS_Store
 src-tauri/gen/schemas
 coverage
+dist-linux
