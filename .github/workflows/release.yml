@@ -1,9 +1,11 @@
 name: Release
 
-# Publishes the Linux executables when a version tag is pushed:
+# Publishes the Linux and Windows installers when a version tag is pushed:
 #   git tag v0.2.0 && git push origin v0.2.0
-# The build runs in the same Ubuntu 22.04 container as scripts/build-linux.sh,
-# so CI and local builds produce identical, portable artifacts.
+# Linux builds in the same Ubuntu 22.04 container as scripts/build-linux.sh, so
+# CI and local builds produce identical, portable artifacts. Windows builds
+# natively on a GitHub-hosted runner (scripts/build-windows.ps1 does the same
+# locally).
 
 on:
   push:
@@ -29,11 +31,48 @@ jobs:
           name: branchly-linux
           path: dist-linux/*
 
+  windows:
+    name: Windows (NSIS, MSI)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the installers
+        shell: pwsh
+        run: scripts/build-windows.ps1
+
+      - name: Upload artifacts to the workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: branchly-windows
+          path: dist-windows/*
+
+  release:
+    name: Draft release
+    # Only for version tags; manual runs just keep the artifacts above.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [linux, windows]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
       - name: Create a draft release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: Branchly ${{ github.ref_name }}
           draft: true
           generate_release_notes: true
-          files: dist-linux/*
+          files: |
+            dist/branchly-linux/*
+            dist/branchly-windows/*

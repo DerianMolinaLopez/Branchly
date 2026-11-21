@@ -5,6 +5,12 @@ con Tauri 2 (Rust + WebView del sistema) y React.
 
 ![Gráfica de commits de ripgrep en Branchly](docs/screenshots/grafica.webp)
 
+> **Software libre y privado.** Branchly se distribuye con licencia
+> [MIT](LICENSE-MIT) o [Apache 2.0](LICENSE-APACHE), a tu elección. No recopila
+> información ni tiene telemetría, y nunca ve tus credenciales: todo ocurre en
+> tu equipo. Los detalles y cómo verificarlo están en
+> [docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
+
 ## Funcionalidades
 
 - **Repositorios**: abrir una carpeta, clonar desde una URL con progreso y
@@ -41,12 +47,51 @@ con Tauri 2 (Rust + WebView del sistema) y React.
 | ![Pantalla de inicio](docs/screenshots/inicio.webp) | ![Paleta de comandos](docs/screenshots/paleta.webp) |
 | ![Staging por bloques](docs/screenshots/staging.webp) | ![Diff lado a lado](docs/screenshots/diff-lado-a-lado.webp) |
 
-## Instalar y usar
+## Instalación
 
-¿Solo quieres usar Branchly? Sigue [docs/EJECUCION.md](docs/EJECUCION.md):
-AppImage para cualquier distribución, `.deb` o `.rpm`, y cómo fijarlo en la
-barra de tareas. Para generar esos ejecutables, consulta
-[docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
+Descarga el instalador de tu sistema desde la página de
+[Releases](https://github.com/DerianMolinaLopez/Branchly/releases). En todos
+los casos necesitas [Git](https://git-scm.com) instalado, porque Branchly usa
+tu `git` para clonar, fetch, pull, push y commits.
+
+| Sistema | Archivo | Cómo instalarlo |
+|---|---|---|
+| **Windows 10 / 11** (64 bits) | `Branchly_x.y.z_x64-setup.exe` | Doble clic. Se instala solo para tu usuario, sin permisos de administrador |
+| Windows (empresas, directivas de grupo) | `Branchly_x.y.z_x64_es-ES.msi` | Doble clic, o `msiexec /i` para despliegues |
+| Ubuntu, Debian, Mint, Pop!_OS | `Branchly_x.y.z_amd64.deb` | `sudo apt install ./Branchly_*_amd64.deb` |
+| Fedora, RHEL, openSUSE | `Branchly-x.y.z-1.x86_64.rpm` | `sudo dnf install ./Branchly-*.x86_64.rpm` |
+| Cualquier distribución Linux | `Branchly_x.y.z_amd64.AppImage` | `chmod +x Branchly_*.AppImage && ./Branchly_*.AppImage` |
+
+### Windows
+
+1. Instala [Git for Windows](https://git-scm.com/download/win) y deja la opción
+   que lo añade al `PATH`. Incluye Git Credential Manager, que guarda tus
+   credenciales para que push y fetch no las pidan cada vez.
+2. Ejecuta el `.exe` de Branchly. Microsoft Edge WebView2, que Branchly
+   necesita, ya viene con Windows 10 y 11.
+3. Los instaladores aún no están firmados, así que SmartScreen puede avisar de
+   un editor desconocido: pulsa «Más información» → «Ejecutar de todas
+   formas». Puedes comprobar la descarga con `SHA256SUMS-windows.txt`
+   (`Get-FileHash <archivo>` en PowerShell).
+4. Para desinstalar: «Configuración» → «Aplicaciones».
+
+### Linux
+
+Los ejecutables se prueban en Ubuntu 22.04 y 24.04, Debian 12, Fedora 40, Arch
+y openSUSE Tumbleweed. El AppImage puede pedir FUSE 2 (`sudo apt install
+libfuse2`). Cómo añadirlo al menú y a la barra de tareas, y los problemas
+frecuentes, en [docs/EJECUCION.md](docs/EJECUCION.md).
+
+### Desde la terminal
+
+```bash
+branchly                       # pantalla de inicio
+branchly ~/code/mi-proyecto    # abre ese repositorio
+```
+
+¿Prefieres compilarlo tú? Consulta [Requisitos](#requisitos) y
+[Desarrollo](#desarrollo), o [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md) para
+generar los instaladores de Linux y Windows.
 
 ## Requisitos
 
@@ -124,7 +169,7 @@ plataforma actual en `target/release/bundle/`:
 |---|---|
 | Linux | `.deb`, `.rpm`, `.AppImage` |
 | macOS | `.app`, `.dmg` |
-| Windows | `.msi`, `.exe` (NSIS) |
+| Windows | `.exe` (NSIS), `.msi`; con `scripts\build-windows.ps1` o ver [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md#windows) |
 
 Para generar solo algunos formatos: `npm run app:build -- --bundles deb,rpm`.
 Estos paquetes solo funcionan en tu distribución y versiones más nuevas. Para
@@ -204,3 +249,27 @@ docs/adr/               Decisiones de arquitectura
 - **Los cambios hechos fuera no se refrescan en repositorios enormes**: puede
   agotarse el límite de inotify. Súbelo con
   `sudo sysctl fs.inotify.max_user_watches=524288`.
+
+## Privacidad
+
+Branchly no envía datos a ningún sitio: no hay telemetría, analíticas ni
+informes de errores, y el código no incluye ningún cliente HTTP. Las
+operaciones de red las hace tu propio `git`, que resuelve las credenciales con
+tu *credential helper* o `ssh-agent`; Branchly no las lee ni las guarda. Más en
+[docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
+
+## Licencia
+
+Branchly es software libre. Puedes usarlo, modificarlo y redistribuirlo, también
+con fines comerciales, bajo cualquiera de estas dos licencias, a tu elección:
+
+- [Licencia MIT](LICENSE-MIT)
+- [Licencia Apache, versión 2.0](LICENSE-APACHE)
+
+Salvo que indiques lo contrario, toda contribución que envíes a este
+repositorio se licencia bajo ese mismo doble régimen (MIT o Apache-2.0), sin
+términos ni condiciones adicionales.
+
+Las dependencias conservan sus propias licencias; por ejemplo, libgit2 se
+distribuye bajo GPL-2.0 con excepción de enlazado, que permite incluirla en
+programas con otras licencias.

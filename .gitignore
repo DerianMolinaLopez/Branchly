@@ -6,3 +6,4 @@ target
 src-tauri/gen/schemas
 coverage
 dist-linux
+dist-windows
