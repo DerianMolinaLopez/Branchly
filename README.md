@@ -51,7 +51,9 @@ con Tauri 2 (Rust + WebView del sistema) y React.
 
 ¿Solo quieres usar Branchly? Sigue [docs/EJECUCION.md](docs/EJECUCION.md):
 AppImage para cualquier distribución, `.deb` o `.rpm`, y cómo fijarlo en la
-barra de tareas. Para generar esos ejecutables, consulta
+barra de tareas. En Windows, instala el `.exe` de la página de Releases
+([instrucciones](docs/EJECUCION.md#windows)). Para generar los ejecutables,
+consulta
 [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
 
 ## Requisitos
@@ -130,7 +132,7 @@ plataforma actual en `target/release/bundle/`:
 |---|---|
 | Linux | `.deb`, `.rpm`, `.AppImage` |
 | macOS | `.app`, `.dmg` |
-| Windows | `.msi`, `.exe` (NSIS) |
+| Windows | `.msi`, `.exe` (NSIS); ver [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md#windows) |
 
 Para generar solo algunos formatos: `npm run app:build -- --bundles deb,rpm`.
 Estos paquetes solo funcionan en tu distribución y versiones más nuevas. Para
