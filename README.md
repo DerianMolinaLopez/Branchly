@@ -5,6 +5,12 @@ con Tauri 2 (Rust + WebView del sistema) y React.
 
 ![Gráfica de commits de ripgrep en Branchly](docs/screenshots/grafica.webp)
 
+> **Software libre y privado.** Branchly se distribuye con licencia
+> [MIT](LICENSE-MIT) o [Apache 2.0](LICENSE-APACHE), a tu elección. No recopila
+> información ni tiene telemetría, y nunca ve tus credenciales: todo ocurre en
+> tu equipo. Los detalles y cómo verificarlo están en
+> [docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
+
 ## Funcionalidades
 
 - **Repositorios**: abrir una carpeta, clonar desde una URL con progreso y
@@ -204,3 +210,27 @@ docs/adr/               Decisiones de arquitectura
 - **Los cambios hechos fuera no se refrescan en repositorios enormes**: puede
   agotarse el límite de inotify. Súbelo con
   `sudo sysctl fs.inotify.max_user_watches=524288`.
+
+## Privacidad
+
+Branchly no envía datos a ningún sitio: no hay telemetría, analíticas ni
+informes de errores, y el código no incluye ningún cliente HTTP. Las
+operaciones de red las hace tu propio `git`, que resuelve las credenciales con
+tu *credential helper* o `ssh-agent`; Branchly no las lee ni las guarda. Más en
+[docs/PRIVACIDAD.md](docs/PRIVACIDAD.md).
+
+## Licencia
+
+Branchly es software libre. Puedes usarlo, modificarlo y redistribuirlo, también
+con fines comerciales, bajo cualquiera de estas dos licencias, a tu elección:
+
+- [Licencia MIT](LICENSE-MIT)
+- [Licencia Apache, versión 2.0](LICENSE-APACHE)
+
+Salvo que indiques lo contrario, toda contribución que envíes a este
+repositorio se licencia bajo ese mismo doble régimen (MIT o Apache-2.0), sin
+términos ni condiciones adicionales.
+
+Las dependencias conservan sus propias licencias; por ejemplo, libgit2 se
+distribuye bajo GPL-2.0 con excepción de enlazado, que permite incluirla en
+programas con otras licencias.
