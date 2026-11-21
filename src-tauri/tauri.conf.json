@@ -40,6 +40,9 @@
     "active": true,
     "targets": "all",
     "category": "DeveloperTool",
+    "publisher": "Branchly contributors",
+    "copyright": "Copyright (c) 2026 Branchly contributors",
+    "license": "MIT OR Apache-2.0",
     "shortDescription": "Cliente Git ligero y moderno",
     "longDescription": "Branchly es un cliente Git de escritorio ligero, con gráfica de commits, staging por hunk, ramas, stash y más.",
     "icon": [
@@ -52,6 +55,15 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Spanish", "English"]
+      },
+      "wix": {
+        "language": "es-ES"
+      }
+    },
     "linux": {
       "deb": {
         "depends": ["git"],
