@@ -55,6 +55,15 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Spanish", "English"]
+      },
+      "wix": {
+        "language": "es-ES"
+      }
+    },
     "linux": {
       "deb": {
         "depends": ["git"],
