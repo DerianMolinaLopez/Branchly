@@ -47,14 +47,51 @@ con Tauri 2 (Rust + WebView del sistema) y React.
 | ![Pantalla de inicio](docs/screenshots/inicio.webp) | ![Paleta de comandos](docs/screenshots/paleta.webp) |
 | ![Staging por bloques](docs/screenshots/staging.webp) | ![Diff lado a lado](docs/screenshots/diff-lado-a-lado.webp) |
 
-## Instalar y usar
+## Instalación
 
-¿Solo quieres usar Branchly? Sigue [docs/EJECUCION.md](docs/EJECUCION.md):
-AppImage para cualquier distribución, `.deb` o `.rpm`, y cómo fijarlo en la
-barra de tareas. En Windows, instala el `.exe` de la página de Releases
-([instrucciones](docs/EJECUCION.md#windows)). Para generar los ejecutables,
-consulta
-[docs/CONSTRUCCION.md](docs/CONSTRUCCION.md).
+Descarga el instalador de tu sistema desde la página de
+[Releases](https://github.com/DerianMolinaLopez/Branchly/releases). En todos
+los casos necesitas [Git](https://git-scm.com) instalado, porque Branchly usa
+tu `git` para clonar, fetch, pull, push y commits.
+
+| Sistema | Archivo | Cómo instalarlo |
+|---|---|---|
+| **Windows 10 / 11** (64 bits) | `Branchly_x.y.z_x64-setup.exe` | Doble clic. Se instala solo para tu usuario, sin permisos de administrador |
+| Windows (empresas, directivas de grupo) | `Branchly_x.y.z_x64_es-ES.msi` | Doble clic, o `msiexec /i` para despliegues |
+| Ubuntu, Debian, Mint, Pop!_OS | `Branchly_x.y.z_amd64.deb` | `sudo apt install ./Branchly_*_amd64.deb` |
+| Fedora, RHEL, openSUSE | `Branchly-x.y.z-1.x86_64.rpm` | `sudo dnf install ./Branchly-*.x86_64.rpm` |
+| Cualquier distribución Linux | `Branchly_x.y.z_amd64.AppImage` | `chmod +x Branchly_*.AppImage && ./Branchly_*.AppImage` |
+
+### Windows
+
+1. Instala [Git for Windows](https://git-scm.com/download/win) y deja la opción
+   que lo añade al `PATH`. Incluye Git Credential Manager, que guarda tus
+   credenciales para que push y fetch no las pidan cada vez.
+2. Ejecuta el `.exe` de Branchly. Microsoft Edge WebView2, que Branchly
+   necesita, ya viene con Windows 10 y 11.
+3. Los instaladores aún no están firmados, así que SmartScreen puede avisar de
+   un editor desconocido: pulsa «Más información» → «Ejecutar de todas
+   formas». Puedes comprobar la descarga con `SHA256SUMS-windows.txt`
+   (`Get-FileHash <archivo>` en PowerShell).
+4. Para desinstalar: «Configuración» → «Aplicaciones».
+
+### Linux
+
+Los ejecutables se prueban en Ubuntu 22.04 y 24.04, Debian 12, Fedora 40, Arch
+y openSUSE Tumbleweed. El AppImage puede pedir FUSE 2 (`sudo apt install
+libfuse2`). Cómo añadirlo al menú y a la barra de tareas, y los problemas
+frecuentes, en [docs/EJECUCION.md](docs/EJECUCION.md).
+
+### Desde la terminal
+
+```bash
+branchly                       # pantalla de inicio
+branchly ~/code/mi-proyecto    # abre ese repositorio
+```
+
+¿Prefieres compilarlo tú? Consulta [Requisitos](#requisitos) y
+[Desarrollo](#desarrollo), o [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md) para
+generar los instaladores de Linux y Windows.
 
 ## Requisitos
 
@@ -132,7 +169,7 @@ plataforma actual en `target/release/bundle/`:
 |---|---|
 | Linux | `.deb`, `.rpm`, `.AppImage` |
 | macOS | `.app`, `.dmg` |
-| Windows | `.msi`, `.exe` (NSIS); ver [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md#windows) |
+| Windows | `.exe` (NSIS), `.msi`; con `scripts\build-windows.ps1` o ver [docs/CONSTRUCCION.md](docs/CONSTRUCCION.md#windows) |
 
 Para generar solo algunos formatos: `npm run app:build -- --bundles deb,rpm`.
 Estos paquetes solo funcionan en tu distribución y versiones más nuevas. Para
