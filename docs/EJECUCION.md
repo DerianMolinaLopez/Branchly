@@ -1,6 +1,6 @@
-# Instalar y ejecutar Branchly en Linux
+# Instalar y ejecutar Branchly
 
-Guía para usar Branchly sin compilarlo. Si quieres generar los ejecutables,
+Guía para usar Branchly sin compilarlo, en Linux y [Windows](#windows). Si quieres generar los ejecutables,
 consulta [CONSTRUCCION.md](CONSTRUCCION.md).
 
 ## Qué descargar
@@ -103,6 +103,28 @@ sudo zypper install ./Branchly-*.x86_64.rpm   # openSUSE
 ```
 
 Desinstalar: `sudo dnf remove branchly` o `sudo zypper remove branchly`.
+
+<a id="windows"></a>
+
+## Windows
+
+Descarga de la página de Releases uno de estos archivos (Windows 10 u 11,
+64 bits):
+
+| Archivo | Para qué |
+|---|---|
+| `Branchly_x.y.z_x64-setup.exe` | Instalador recomendado: por usuario, sin permisos de administrador |
+| `Branchly_x.y.z_x64_es-ES.msi` | Para despliegues y directivas de grupo |
+
+Antes, instala [Git for Windows](https://git-scm.com/download/win) y deja que
+lo añada al `PATH`. Para que push y fetch no pidan contraseña, usa Git
+Credential Manager (viene con Git for Windows).
+
+Los instaladores no están firmados, así que SmartScreen puede avisar:
+«Más información» → «Ejecutar de todas formas». Comprueba la descarga con
+`SHA256SUMS-windows.txt` (`Get-FileHash <archivo>`).
+
+Desinstalar: «Configuración» → «Aplicaciones».
 
 ## Uso desde la terminal
 

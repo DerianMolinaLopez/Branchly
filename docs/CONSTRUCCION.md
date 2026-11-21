@@ -1,9 +1,10 @@
-# Construir los ejecutables de Linux
+# Construir los ejecutables de Linux y Windows
 
 Cómo generar Branchly como **AppImage** (un único ejecutable para cualquier
 distribución) y como paquetes **.deb** y **.rpm**, integrados en el menú de
 aplicaciones y la barra de tareas. Para instalarlos y usarlos, consulta
-[EJECUCION.md](EJECUCION.md).
+[EJECUCION.md](EJECUCION.md). Los instaladores de Windows están
+[más abajo](#windows).
 
 ```bash
 scripts/build-linux.sh            # AppImage + .deb + .rpm portables en dist-linux/
@@ -166,6 +167,43 @@ CI son idénticos a los locales. Se activa al subir una etiqueta de versión:
 También puede lanzarse a mano desde la pestaña Actions («Run workflow»); en
 ese caso solo se guardan los artefactos, sin crear Release.
 
+<a id="windows"></a>
+
+## Construir los instaladores de Windows
+
+Genera un instalador **NSIS** (`.exe`, por usuario y sin permisos de
+administrador) y un **MSI**. Para instalarlos, consulta
+[EJECUCION.md](EJECUCION.md#windows).
+
+A diferencia de Linux, aquí no hace falta contenedor: Windows mantiene la
+compatibilidad hacia atrás y el WebView (Microsoft Edge WebView2) viene con
+Windows 10/11, así que el instalador no incluye ningún navegador.
+
+**Con GitHub Actions** (lo habitual): el workflow `Release` compila Linux y
+Windows en paralelo al subir una etiqueta `v*` (ver [fase 4](#4-publicación-automática))
+y adjunta todo al mismo borrador de Release. Para probar solo el build, lánzalo
+a mano desde Actions («Run workflow») y descarga el artefacto
+`branchly-windows`.
+
+**En tu máquina Windows**, con [Node.js](https://nodejs.org) 20+,
+[Rust](https://rustup.rs) (toolchain MSVC) y las *Build Tools* de Visual Studio
+con «Desarrollo para el escritorio con C++»:
+
+```powershell
+scripts\build-windows.ps1     # NSIS + MSI y SHA256SUMS-windows.txt en dist-windows\
+```
+
+Detalles:
+
+- Branchly usa tu `git`, así que necesita [Git for Windows](https://git-scm.com/download/win)
+  en el `PATH` al ejecutarse (no al compilar).
+- El instalador MSI usa WiX, que Tauri descarga la primera vez; necesita
+  conexión a Internet en esa compilación.
+- Los instaladores **no están firmados**: Windows SmartScreen avisará de que el
+  editor es desconocido («Más información» → «Ejecutar de todas formas»).
+  Verifica la descarga con `SHA256SUMS-windows.txt`. Firmarlos requiere un
+  certificado de firma de código.
+
 ## Lista de verificación antes de publicar
 
 - [ ] `packaging/linux/test-appimage.sh` pasa en todas las distribuciones.
@@ -176,6 +214,10 @@ ese caso solo se guardan los artefactos, sin crear Release.
 - [ ] Clonar, fetch y push funcionan con HTTPS (credential helper) y SSH
       (`ssh-agent`).
 - [ ] `sha256sum -c SHA256SUMS` dentro de `dist-linux/`.
+- [ ] En Windows 10 y 11: instalar el `.exe` y el `.msi`, abrir un repositorio,
+      cambiar de pestaña con un solo clic y comprobar fetch y push con Git
+      Credential Manager.
+- [ ] `Get-FileHash` coincide con `SHA256SUMS-windows.txt`.
 
 <a id="icono-y-logo"></a>
 
